@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ===== VARIABLES DE DISEÑO ===== */
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --chat-bg: #eef2ff;
+            --msg-sent: #6366f1;
+            --msg-received: #ffffff;
+            --radius-lg: 20px;
+            --radius-sm: 12px;
+            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ===== RESET & BASE ===== */
+        * {margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif;}
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ===== LAYOUT PRINCIPAL ===== */
+        .main-wrapper {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex-grow: 1;
+        }
+
+        /* ===== HEADER ===== */
+        header { text-align: center; padding: 10px 0 10px 0; }
+        .header-content h1 { font-weight: 600; color: var(--primary-dark); font-size: 1.8rem; letter-spacing: -0.5px; }
+
+        /* ===== NUEVO: ESTILOS PARA LA SECCIÓN DE INSTRUCCIONES ===== */
+        .instruction-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--primary-color);
+            margin-bottom: 10px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .instruction-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .scenario-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .scenario-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 12px;
+            align-items: flex-start;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-main);
+        }
+
+        .scenario-number {
+            background-color: var(--chat-bg);
+            color: var(--primary-color);
+            font-weight: 700;
+            min-width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        /* ===== AUTH MESSAGES ===== */
+        .auth-message {
+            padding: 15px 20px; border-radius: var(--radius-sm); text-align: center; font-weight: 500; font-size: 0.9rem; display: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 10px;
+        }
+        .auth-message.error { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .auth-message.success { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+
+        /* ===== CHAT CONTAINER ===== */
+        .chat-container {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 65vh;
+            min-height: 500px;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.5);
+            position: relative; 
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            padding: 18px 25px; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); z-index: 10;
+        }
+        .chat-header h2 { font-size: 1.1rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        #participantCount { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; backdrop-filter: blur(4px); }
+
+        /* ===== MENSAJES ===== */
+        .chat-messages {
+            flex-grow: 1; padding: 25px; overflow-y: auto; background-color: var(--chat-bg); display: flex; flex-direction: column; gap: 15px; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;
+            position: relative;
+        }
+
+        .message {
+            max-width: 85%; padding: 12px 18px; border-radius: 18px; position: relative; line-height: 1.5; font-size: 0.95rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .message.received { background-color: var(--msg-received); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .message.sent { background-color: var(--msg-sent); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+
+        .message-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; font-size: 0.75rem; opacity: 0.8; gap: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 4px; }
+        .message.sent .message-header { border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .message-user { font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .message.sent .message-user { order: 1; }
+        .message.sent .message-time { order: 2; }
+
+        /* ===== INPUT ===== */
+        .chat-input { padding: 20px; background-color: white; border-top: 1px solid #e2e8f0; }
+        .message-input-container { display: flex; gap: 12px; align-items: flex-end; background: #f8fafc; padding: 10px; border-radius: var(--radius-lg); border: 1px solid #e2e8f0; transition: all 0.3s ease; }
+        .message-input-container:focus-within { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); background: white; }
+        .message-input { flex-grow: 1; padding: 8px; border: none; background: transparent; outline: none; font-size: 0.95rem; resize: none; min-height: 24px; max-height: 120px; color: var(--text-main); }
+        
+        .send-btn { background-color: var(--primary-color); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3); }
+        .send-btn:hover:not(:disabled) { transform: scale(1.05); background-color: var(--primary-dark); }
+        .send-btn:disabled { background-color: #cbd5e1; cursor: not-allowed; box-shadow: none; }
+
+        .word-count { font-size: 0.8rem; text-align: right; margin-top: 8px; margin-right: 5px; font-weight: 500; }
+        .word-count.warning { color: #ef4444; }
+        .word-count.success { color: #10b981; }
+
+        /* ===== NAVEGACIÓN ===== */
+        .page-navigation { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 20px; }
+        .nav-btn { padding: 12px 24px; border-radius: 50px; border: none; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .nav-btn.prev { background-color: white; color: var(--text-light); border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .nav-btn.prev:hover { background-color: #f8fafc; color: var(--text-main); }
+        .nav-btn.next { background-color: var(--text-main); color: white; box-shadow: 0 4px 10px rgba(30, 41, 59, 0.2); }
+        .nav-btn.next:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(30, 41, 59, 0.3); }
+        .nav-btn.next:disabled { background-color: #cbd5e1; color: white; cursor: not-allowed; box-shadow: none; opacity: 0.7; }
+
+        .loading { text-align: center; padding: 40px; color: var(--text-light); font-style: italic; }
+
+        /* ===== BOTÓN DE NUEVOS MENSAJES ===== */
+        .new-messages-indicator {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 50;
+        }
+
+        .new-messages-indicator.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .new-messages-indicator:hover { background-color: var(--text-main); transform: translateX(-50%) scale(1.05); }
+        .badge-count { background: #ef4444; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <header>
+            <div class="header-content">
+                <div class="logo" style="display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:5px;">
+                    <i class="fas fa-comments" style="color:var(--primary-color); font-size: 1.5rem;"></i>
+                    <h1>Actividad 1</h1>
+                </div>
+            </div>
+        </header>
+
+        <div class="auth-message" id="authMessage"></div>
+
+        <div class="instruction-card">
+            <div class="instruction-title">
+                <i class="fas fa-clipboard-list"></i>
+                Instrucciones
+            </div>
+            <p style="margin-bottom: 15px; color: var(--text-light); font-size: 0.95rem;">
+                Con base en las siguientes situaciones, redacta como abordarías al personal a tu cargo:
+            </p>
+            <ul class="scenario-list">
+                <li class="scenario-item">
+                    <span class="scenario-number">1</span>
+                    <span>El trabajador se encuentra en el área de proceso y se observa que no está realizando ninguna actividad.</span>
+                </li>
+                <li class="scenario-item">
+                    <span class="scenario-number">2</span>
+                    <span>El trabajador se encuentra realizando una actividad de mantenimiento y se observa que está utilizando herramientas inadecuadas.</span>
+                </li>
+                <li class="scenario-item">
+                    <span class="scenario-number">3</span>
+                    <span>Se observa que la persona lleva el Equipo de Protección Personal en mal estado.</span>
+                </li>
+                <li class="scenario-item">
+                    <span class="scenario-number">4</span>
+                    <span>El supervisor pasa en el área de proceso y encuentra en su camino restos considerables de aceite y grasas.</span>
+                </li>
+                <li class="scenario-item">
+                    <span class="scenario-number">5</span>
+                    <span>En el área de proceso se encuentra trabajando personal con equipos eléctricos que pueden generar residuos proyectados y no cuenta con barreras protectoras.</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="chat-header">
+                <h2>
+                    <i class="fas fa-users" style="font-size:0.9em;"></i>
+                </h2>
+                <span id="participantCount"><i class="fas fa-circle-notch fa-spin"></i></span>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="loading" id="loadingIndicator">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando conversación...
+                </div>
+            </div>
+
+            <div class="new-messages-indicator" id="newMessagesBtn">
+                <span class="badge-count" id="newMsgCount">0</span>
+                <span>Nuevos mensajes</span>
+                <i class="fas fa-arrow-down"></i>
+            </div>
+
+            <div class="chat-input">
+                <div class="message-input-container">
+                    <textarea class="message-input" id="messageInput" placeholder="Escribe aquí (mínimo 30 palabras)..."></textarea>
+                    <button class="send-btn" id="sendBtn" disabled title="Enviar mensaje">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="word-count" id="wordCount">0 palabras</div>
+            </div>
+        </div>
+
+        <div class="page-navigation">
+            <button class="nav-btn prev" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Volver al Curso
+            </button>
+            <button class="nav-btn next" id="next-button" disabled>
+                Siguiente Actividad <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+   <script>
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwm_UfWpw4CsbgzFQPCunSjvQh8lDQMtEJ2QUBWpnwPt7bP8wfOzGEDQuX8QhdPaS-smw/exec'; 
+    const SHEET_NAME = 'Actividad 1'; 
+    let userName = '';
+    let refreshInterval;
+    let hasSentMessage = false;
+
+    // Variables para control de scroll y mensajes nuevos
+    let lastMessageCount = 0;
+    let unreadCount = 0;
+    let isFirstLoad = true;
+
+    function goNext() { window.location.href = 'Actividad-02.html'; }
+    function goBack() { window.location.href = '../../index.html'; }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const authMessage = document.getElementById('authMessage');
+        const chatContainer = document.getElementById('chatContainer');
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const participantCount = document.getElementById('participantCount');
+        const wordCount = document.getElementById('wordCount');
+        const nextButton = document.getElementById('next-button');
+        
+        // Elementos nuevos
+        const newMessagesBtn = document.getElementById('newMessagesBtn');
+        const newMsgCountLabel = document.getElementById('newMsgCount');
+
+        if (nextButton) {
+            nextButton.disabled = true;
+            nextButton.style.opacity = "0.7";
+            nextButton.style.cursor = "not-allowed";
+        }
+
+        // --- FUNCIONES DE CONTROL DE SCROLL ---
+
+        // Verificar si el usuario está viendo el fondo del chat (con un margen de error)
+        function isUserAtBottom() {
+            const threshold = 100; // Margen de píxeles
+            const position = chatMessages.scrollTop + chatMessages.clientHeight;
+            const height = chatMessages.scrollHeight;
+            return position > height - threshold;
+        }
+
+        // Scroll suave al final
+        function scrollToBottom() {
+            chatMessages.scrollTo({
+                top: chatMessages.scrollHeight,
+                behavior: 'smooth'
+            });
+            hideNewMessageBadge();
+        }
+
+        // Mostrar notificación
+        function showNewMessageBadge(count) {
+            unreadCount += count;
+            newMsgCountLabel.textContent = unreadCount;
+            newMessagesBtn.classList.add('visible');
+        }
+
+        // Ocultar notificación
+        function hideNewMessageBadge() {
+            unreadCount = 0;
+            newMessagesBtn.classList.remove('visible');
+        }
+
+        // Evento click en el botón de nuevos mensajes
+        newMessagesBtn.addEventListener('click', scrollToBottom);
+
+        // Evento scroll para detectar si el usuario baja manualmente
+        chatMessages.addEventListener('scroll', () => {
+            if (isUserAtBottom()) {
+                hideNewMessageBadge();
+            }
+        });
+
+
+        // --- AUTENTICACIÓN ---
+        function checkAuthentication() {
+            const userDataStr = localStorage.getItem('userData');
+            let isAuthenticated = false;
+
+            if (userDataStr) {
+                try {
+                    const user = JSON.parse(userDataStr);
+                    if (user && user.firstName && user.lastName) {
+                        userName = `${user.firstName} ${user.lastName}`;
+                        isAuthenticated = true;
+                    }
+                } catch (e) {
+                    console.error('Error al parsear datos:', e);
+                }
+            }
+            
+            if (isAuthenticated) {
+                authMessage.innerHTML = `<i class="fas fa-check-circle"></i> Bienvenido/a, ${userName}`;
+                authMessage.className = 'auth-message success';
+                authMessage.style.display = 'block';
+                chatContainer.style.display = 'flex';
+                
+                loadMessages();
+                refreshInterval = setInterval(loadMessages, 5000);
+            } else {
+                authMessage.innerHTML = `<i class="fas fa-exclamation-circle"></i> Debes iniciar sesión. Redirigiendo...`;
+                authMessage.className = 'auth-message error';
+                authMessage.style.display = 'block';
+                chatContainer.style.display = 'none';
+                setTimeout(() => { window.location.href = '../../index.html'; }, 3000);
+            }
+        }
+
+        function countWords(text) {
+            const trimmedText = text.trim();
+            if (trimmedText === '') return 0;
+            return trimmedText.split(/\s+/).length;
+        }
+
+        function updateWordCount() {
+            const text = messageInput.value;
+            const wordCountValue = countWords(text);
+            wordCount.textContent = `${wordCountValue} palabras`;
+            wordCount.className = wordCountValue < 30 ? 'word-count warning' : 'word-count success';
+            sendBtn.disabled = wordCountValue < 30;
+            autoExpandTextarea(messageInput);
+        }
+
+        function autoExpandTextarea(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
+        }
+
+        function loadMessages() {
+            fetch(`${WEB_APP_URL}?action=getMessages&sheetName=${encodeURIComponent(SHEET_NAME)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayMessages(data.messages);
+                    participantCount.textContent = `${data.participants} en línea`;
+                }
+            })
+            .catch(error => console.error('Error al cargar mensajes:', error));
+        }
+
+        function displayMessages(messages) {
+            loadingIndicator.style.display = 'none';
+            
+            // 1. Obtener cuántos mensajes ya están dibujados en pantalla
+            const existingMessages = chatMessages.querySelectorAll('.message');
+            const existingCount = existingMessages.length;
+            const totalMessages = messages.length;
+
+            // 2. Variables para control de scroll
+            const previousScrollTop = chatMessages.scrollTop;
+            const wasAtBottom = isUserAtBottom();
+
+            // 3. Si hay menos mensajes que antes (ej. se borraron en el Excel), reconstruimos todo
+            if (totalMessages < existingCount) {
+                chatMessages.innerHTML = '';
+                // Recursivamente llamamos a la función como si fuera carga inicial
+                displayMessages(messages); 
+                return;
+            }
+
+            // 4. Si hay mensajes NUEVOS, solo agregamos esos (evita el parpadeo)
+            if (totalMessages > existingCount) {
+                
+                // Iteramos solo sobre los mensajes nuevos (desde el último índice conocido)
+                for (let i = existingCount; i < totalMessages; i++) {
+                    const message = messages[i];
+                    
+                    const messageElement = document.createElement('div');
+                    const isOwnMessage = message.user === userName;
+                    messageElement.classList.add('message', isOwnMessage ? 'sent' : 'received');
+
+                    let displayDate = '';
+                    if (message.date) {
+                        try {
+                            const dateObj = new Date(message.date);
+                            displayDate = dateObj.toLocaleDateString('sv-SE'); 
+                        } catch (e) { displayDate = message.date; }
+                    }
+                    
+                    messageElement.innerHTML = `
+                        <div class="message-header">
+                            <span class="message-time">${displayDate}</span> 
+                            <span class="message-user">${message.user}</span>
+                        </div>
+                        <p>${message.text}</p>
+                    `;
+                    
+                    chatMessages.appendChild(messageElement);
+                }
+
+                // 5. Lógica de Scroll Inteligente (Solo si hubo mensajes nuevos)
+                const newMessagesCount = totalMessages - existingCount;
+                const lastMsg = messages[totalMessages - 1];
+
+                if (isFirstLoad) {
+                    scrollToBottom();
+                    isFirstLoad = false;
+                } else {
+                    // Si es MI mensaje o si yo ya estaba al final, bajar el scroll
+                    if ((lastMsg && lastMsg.user === userName) || wasAtBottom) {
+                        scrollToBottom();
+                    } else {
+                        // Si estoy leyendo arriba, mostrar notificación
+                        showNewMessageBadge(newMessagesCount);
+                    }
+                }
+            }
+            
+            // Actualizar referencia
+            lastMessageCount = totalMessages;
+        }
+
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            const wordCountValue = countWords(messageText);
+            if (wordCountValue < 30) {
+                alert(`Tu mensaje debe tener al menos 30 palabras.`);
+                return;
+            }
+
+            messageInput.disabled = true;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'addMessage',
+                    user: userName,
+                    text: messageText,
+                    sheetName: SHEET_NAME
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    messageInput.value = '';
+                    updateWordCount();
+                    // Al enviar, forzamos ir abajo en la siguiente carga
+                    isFirstLoad = false; 
+                    loadMessages(); // Esto activará la lógica "es mi mensaje" -> scroll abajo
+                    
+                    if (!hasSentMessage) {
+                        hasSentMessage = true;
+                        if (nextButton) {
+                            nextButton.disabled = false;
+                            nextButton.style.opacity = "1";
+                            nextButton.style.cursor = "pointer";
+                        }
+                        alert('¡Mensaje enviado correctamente! Ya puedes pasar al siguiente tema.');
+                    }
+                } else {
+                    alert('Error al enviar el mensaje');
+                }
+                messageInput.disabled = false;
+                messageInput.focus();
+                sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+            })
+            .catch(error => {
+                alert('Error de conexión.');
+                console.error(error);
+                messageInput.disabled = false;
+                messageInput.focus();
+                sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+            });
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        messageInput.addEventListener('input', updateWordCount);
+
+        checkAuthentication();
+        
+        if (nextButton) {
+            nextButton.addEventListener('click', goNext);
+        }
+    });
+</script>
+</body>
+</html>
