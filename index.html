@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CURSOS ONLINE 2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e2a3a, #2c3e50);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+            padding: 40px;
+            background: rgba(44, 62, 80, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        
+        .logo {
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+        
+        .logo p {
+            font-size: 1.1em;
+            color: #bdc3c7;
+        }
+        
+        .user-info {
+            background: rgba(52, 73, 94, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+            position: relative;
+            padding-right: 120px;
+        }
+        
+        .logout-button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+        
+        .logout-button:hover {
+            background: #c0392b;
+        }
+        
+        /* Título de Cursos Disponibles */
+        .courses-title {
+            font-size: 2em;
+            color: #3498db;
+            margin-bottom: 20px;
+            text-align: center;
+            padding: 15px;
+            background: rgba(52, 73, 94, 0.6);
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        /* Navegación */
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: rgba(52, 73, 94, 0.6);
+            border-radius: 10px;
+            overflow: hidden;
+            flex-wrap: wrap; /* Permitir que baje si es móvil */
+        }
+        
+        .nav-item {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            min-width: 150px;
+        }
+        
+        .nav-item:hover {
+            background: rgba(52, 152, 219, 0.3);
+        }
+        
+        .nav-item.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        /* Nueva interfaz de módulos */
+        .modules-section {
+            margin-top: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            color: #3498db;
+            margin-bottom: 20px;
+            text-align: left;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .search-container {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1em;
+        }
+        
+        .search-box:focus {
+            outline: 2px solid #3498db;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .search-box::placeholder {
+            color: #bdc3c7;
+        }
+        
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .module-card {
+            background: rgba(52, 73, 94, 0.6);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            border-left: 4px solid #3498db;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            background: rgba(52, 73, 94, 0.8);
+        }
+        
+        .module-number {
+            background: #3498db;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .module-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ecf0f1;
+        }
+        
+        .module-description {
+            font-size: 0.9em;
+            color: #bdc3c7;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .module-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .module-button:hover {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        /* Sección T-SIMIN */
+        .tsimin-section, .supervision-section, .others-section {
+            margin-top: 30px;
+            padding: 40px;
+            background: rgba(52, 73, 94, 0.6);
+            border-radius: 10px;
+            display: none;
+        }
+        
+        /* Estilos para módulos T-SIMIN */
+        .tsimin-modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .tsimin-module-card {
+            background: rgba(155, 89, 182, 0.3);
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            border-left: 4px solid #9b59b6;
+        }
+        
+        .tsimin-module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            background: rgba(155, 89, 182, 0.5);
+        }
+        
+        .tsimin-module-number {
+            background: #9b59b6;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .tsimin-module-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ecf0f1;
+        }
+        
+        .tsimin-module-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .tsimin-module-button:hover {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.4);
+        }
+        
+        /* Módulos de Supervisión Efectiva */
+        .supervision-modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .supervision-module-card {
+            background: rgba(41, 128, 185, 0.3);
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            border-left: 4px solid #e67e22;
+        }
+        
+        .supervision-module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            background: rgba(41, 128, 185, 0.5);
+        }
+        
+        .supervision-module-number {
+            background: #e67e22;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .supervision-module-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ecf0f1;
+        }
+        
+        .supervision-module-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .supervision-module-button:hover {
+            background: linear-gradient(135deg, #d35400, #e67e22);
+            box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);
+        }
+        
+        /* --- ESTILOS PARA LA SECCIÓN DE OTROS --- */
+        .others-modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .others-module-card {
+            background: rgba(39, 174, 96, 0.3);
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .others-module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            background: rgba(39, 174, 96, 0.5);
+        }
+        
+        .others-module-number {
+            background: #27ae60;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .others-module-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ecf0f1;
+        }
+        
+        .others-module-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .others-module-button:hover {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+        
+        /* Estilos para el formulario de login */
+        .login-container {
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            padding: 40px;
+            background: rgba(44, 62, 80, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .login-form {
+            margin-top: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bdc3c7;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1em;
+            text-transform: uppercase;
+        }
+        
+        .form-group input::placeholder {
+            text-transform: none;
+            color: #bdc3c7;
+        }
+        
+        .form-group select option {
+            background: #2c3e50;
+            color: white;
+            padding: 10px;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: 2px solid #3498db;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .login-button:hover {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .login-button:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-size: 0.9em;
+            display: none;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container, .login-container {
+                padding: 20px;
+            }
+            
+            .logo h1 {
+                font-size: 2em;
+            }
+            
+            .courses-title {
+                font-size: 1.6em;
+            }
+            
+            .modules-grid, .supervision-modules-grid, .tsimin-modules-grid, .others-modules-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-info {
+                padding-right: 15px;
+                padding-bottom: 60px;
+            }
+            
+            .logout-button {
+                position: static;
+                margin-top: 15px;
+                width: 100%;
+            }
+            
+            .nav-menu {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loginContainer" class="login-container">
+        <div class="logo">
+            <h1>CURSOS EN LINEA</h1>
+            <p>Iniciar Sesión</p>
+        </div>
+        
+        <form id="loginForm" class="login-form">
+            <div class="form-group">
+                <label for="firstName">Nombre(s)</label>
+                <input type="text" id="firstName" placeholder="Ingresa tu(s) nombre(s)" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName">Apellidos</label>
+                <input type="text" id="lastName" placeholder="Ingresa tus apellidos" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="mep">MEP</label>
+                <input type="text" id="mep" placeholder="Ingresa tu MEP" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="region">Región</label>
+                <select id="region" required>
+                    <option value="">Selecciona tu región</option>
+                    <option value="MARINA">MARINA</option>
+                    <option value="SUR">SUR</option>
+                    <option value="NORTE REX">NORTE REX</option>
+                    <option value="NORTE TIH">NORTE TIH</option>
+                </select>
+            </div>
+            
+            <button type="submit" id="loginButton" class="login-button" disabled>
+                Acceder
+            </button>
+            
+            <div id="errorMessage" class="error-message">
+                Por favor, completa todos los campos.
+            </div>
+        </form>
+    </div>
+    
+    <div id="mainContainer" class="container" style="display: none;">
+        <div class="logo">
+            <h1>CURSOS EN LINEA</h1>
+        </div>
+        
+        <div class="user-info">
+            <p>Usuario: <span id="userDisplayName"></span></p>
+            <p>MEP: <span id="userMEP"></span></p>
+            <p>Región: <span id="userRegion"></span></p>
+            <button class="logout-button" id="logoutButton">Cerrar Sesión</button>
+        </div>
+        
+        <div class="courses-title">
+            CURSOS DISPONIBLES
+        </div>
+        
+        <div class="nav-menu">
+            <div class="nav-item active" data-section="modules">ANEXO INTEGRAL</div>
+            <div class="nav-item" data-section="tsimin">T-SIMIN</div>
+            <div class="nav-item" data-section="supervision">SUPERVISIÓN EFECTIVA</div>
+            <div class="nav-item" data-section="others">OTROS</div>
+        </div>
+        
+        <div id="modulesSection" class="modules-section">
+            <h2 class="section-title">Módulos Disponibles</h2>
+            
+            <div class="search-container">
+                <input type="text" id="moduleSearch" class="search-box" placeholder="Buscar módulo por nombre o número...">
+            </div>
+            
+            <div class="modules-grid" id="modulesGrid">
+                </div>
+        </div>
+        
+        <div id="tsiminSection" class="tsimin-section">
+            <h2 class="section-title">T-SIMIN</h2>
+            
+            <div class="search-container">
+                <input type="text" id="tsiminSearch" class="search-box" placeholder="Buscar módulo T-SIMIN...">
+            </div>
+            
+            <div class="tsimin-modules-grid" id="tsiminModulesGrid">
+                </div>
+        </div>
+
+        <div id="supervisionSection" class="supervision-section">
+            <h2 class="section-title">SUPERVISIÓN EFECTIVA</h2>
+            
+            <div class="search-container">
+                <input type="text" id="supervisionSearch" class="search-box" placeholder="Buscar módulo de supervisión...">
+            </div>
+            
+            <div class="supervision-modules-grid" id="supervisionModulesGrid">
+                </div>
+        </div>
+
+        <div id="othersSection" class="others-section">
+            <h2 class="section-title">OTROS CURSOS</h2>
+            
+            <div class="search-container">
+                <input type="text" id="othersSearch" class="search-box" placeholder="Buscar en otros cursos...">
+            </div>
+            
+            <div class="others-modules-grid" id="othersModulesGrid">
+                </div>
+        </div>
+        
+        <div class="footer">
+            <p>IE &copy; 2025</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos del DOM
+            const loginContainer = document.getElementById('loginContainer');
+            const mainContainer = document.getElementById('mainContainer');
+            const loginForm = document.getElementById('loginForm');
+            const loginButton = document.getElementById('loginButton');
+            const errorMessage = document.getElementById('errorMessage');
+            const userDisplayName = document.getElementById('userDisplayName');
+            const userMEP = document.getElementById('userMEP');
+            const userRegion = document.getElementById('userRegion');
+            const logoutButton = document.getElementById('logoutButton');
+            
+            // Elementos de Secciones
+            const modulesGrid = document.getElementById('modulesGrid');
+            const moduleSearch = document.getElementById('moduleSearch');
+            const modulesSection = document.getElementById('modulesSection');
+
+            const tsiminModulesGrid = document.getElementById('tsiminModulesGrid');
+            const tsiminSearch = document.getElementById('tsiminSearch');
+            const tsiminSection = document.getElementById('tsiminSection');
+
+            const supervisionModulesGrid = document.getElementById('supervisionModulesGrid');
+            const supervisionSearch = document.getElementById('supervisionSearch');
+            const supervisionSection = document.getElementById('supervisionSection');
+
+            // Elementos nuevos para OTROS
+            const othersModulesGrid = document.getElementById('othersModulesGrid');
+            const othersSearch = document.getElementById('othersSearch');
+            const othersSection = document.getElementById('othersSection');
+
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            // Datos de los módulos de Anexo Integral
+            const modulesData = [
+                { id: 1, title: "SEGURIDAD, SALUD EN EL TRABAJO Y PROTECCIÓN AMBIENTAL", link: "MODULOS/ANEXO/MODULO-01.html" },
+                { id: 2, title: "REGLAMENTO FEDERAL DE SEGURIDAD Y SALUD EN EL TRABAJO", link: "MODULOS/ANEXO/MODULO-02.html" },
+                { id: 3, title: "REGLAMENTO DE SEGURIDAD E HIGIENE DE PEMEX", link: "MODULOS/ANEXO/MODULO-03.html" },
+                { id: 4, title: "BÁSICO DE SEGURIDAD", link: "MODULOS/ANEXO/MODULO-04.html" },
+                { id: 5, title: "CONCEPTOS BÁSICOS Y DEFINICIONES SOBRE PRE", link: "MODULOS/ANEXO/MODULO-05.html" },
+                { id: 6, title: "CONCEPTOS BÁSICOS Y DEFINICIONES SOBRE PROTECCIÓN AMBIENTAL", link: "MODULOS/ANEXO/MODULO-06.html" },
+                { id: 7, title: "GENERALIDADES DE LOS PRIMEROS AUXILIOS", link: "MODULOS/ANEXO/MODULO-07.html" },
+                { id: 8, title: "USO Y MANEJO DE EXTINTORES", link: "MODULOS/ANEXO/MODULO-08.html" },
+                { id: 9, title: "MANEJO A LA DEFENSIVA (VEHÍCULOS)", link: "MODULOS/ANEXO/MODULO-09.html" },
+                { id: 10, title: "EQUIPO DE RESPIRACIÓN AUTÓNOMA", link: "MODULOS/ANEXO/MODULO-10.html" },
+                { id: 11, title: "USO DE EQUIPOS DE DETECCIÓN DE GASES", link: "MODULOS/ANEXO/MODULO-11.html" },
+                { id: 12, title: "HOJA DE DATOS DE SEGURIDAD", link: "MODULOS/ANEXO/MODULO-12.html" },
+                { id: 13, title: "CLASIFICACIÓN Y MANEJO DE RESIDUOS PELIGROSOS (NOM'S)", link: "MODULOS/ANEXO/MODULO-13.html" },
+                { id: 14, title: "DISPOSITIVOS DE DETECCIÓN Y PRIMEROS AUXILIOS", link: "MODULOS/ANEXO/MODULO-14.html" },
+                { id: 15, title: "LGEEPA", link: "MODULOS/ANEXO/MODULO-15.html" },
+                { id: 16, title: "LGEEPEGIR", link: "MODULOS/ANEXO/MODULO-16.html" },
+                { id: 17, title: "TEORÍA DE LA COMBUSTIÓN", link: "MODULOS/ANEXO/MODULO-17.html" },
+                { id: 18, title: "EQUIPOS DE PROTECCIÓN RESPIRATORIA", link: "MODULOS/ANEXO/MODULO-18.html" },
+                { id: 19, title: "RIESGOS ATMOSFÉRICOS", link: "MODULOS/ANEXO/MODULO-19.html" },
+                { id: 20, title: "RIESGOS EN ESPACIOS CONFINADOS", link: "MODULOS/ANEXO/MODULO-20.html" },
+                { id: 21, title: "IDENTIFICACIÓN DE ÁREAS DE RIESGO EN EL TRABAJO", link: "MODULOS/ANEXO/MODULO-21.html" },
+                { id: 22, title: "PROCEDIMIENTOS CRÍTICOS", link: "MODULOS/ANEXO/MODULO-22.html" },
+                { id: 23, title: "ANÁLISIS DE SEGURIDAD EN EL TRABAJO (AST)", link: "MODULOS/ANEXO/MODULO-23.html" },
+                { id: 24, title: "AUDITORÍAS EFECTIVAS", link: "MODULOS/ANEXO/MODULO-24.html" },
+                { id: 25, title: "INVESTIGACIÓN CAUSA RAÍZ (ICR)", link: "MODULOS/ANEXO/MODULO-25.html" },
+                { id: 26, title: "SISTEMA DE PERMISO PARA TRABAJO CON RIESGO", link: "MODULOS/ANEXO/MODULO-26.html" },
+                { id: 27, title: "SOBREVIVENCIA EN EL MAR", link: "MODULOS/ANEXO/MODULO-27.html" }
+            ];
+            
+            // Datos de los módulos de T-SIMIN
+            const tsiminModulesData = [
+                { id: 1, title: "ÁCIDO SULFHIDRICO Y SUS CARACTERÍSTICAS (H2s)", link: "MODULOS/TSIMIN/MODULO-01.html" },
+                { id: 2, title: "ATLAS DE RIESGO", link: "MODULOS/TSIMIN/MODULO-02.html" },
+                { id: 3, title: "PLAN DE RESPUESTA A EMERGENCIAS (PRE)", link: "MODULOS/TSIMIN/MODULO-03.html" },
+                { id: 4, title: "ANÁLISIS DE RIESGOS", link: "MODULOS/TSIMIN/MODULO-04.html" },
+                { id: 5, title: "CUIDADO Y USO DEL EPP", link: "MODULOS/TSIMIN/MODULO-05.html" },
+                { id: 6, title: "MANTENIMIENTO Y CUIDADO DE HERRAMIENTAS", link: "MODULOS/TSIMIN/MODULO-06.html" },
+                { id: 7, title: "PLAN DE CONTINGENCIA AMBIENTAL EN UNA EMPRESA PETROLERA", link: "MODULOS/TSIMIN/MODULO-07.html" }
+            ];
+            
+            // Datos de los módulos de Supervisión Efectiva
+            const supervisionModulesData = [
+                { id: 1, title: "SUPERVISIÓN EFECTIVA", link: "MODULOS/SUPERVISION_EFECTIVA/MODULO-01.html" }
+            ];
+
+            // Datos de los módulos OTROS
+            const othersModulesData = [
+                { id: 1, title: "LLAVES HIDRÁULICAS", link: "MODULOS/OTROS/LLAVES_HIDRAULICAS.html" },
+                { id: 2, title: "MANEJO INTEGRAL DE RESIDUOS", link:"MODULOS/OTROS/MANEJO_DE_RESIDUOS.html" },
+                { id: 3, title: "MANEJO, TRANSPORTE Y ALMACENAMIENTO DE MATERIALES PELIGROSOS", link:"MODULOS/OTROS/MATERIALES_PELIGROSOS.html" },
+                { id: 4, title: "NOM-005-STPS-1998", link:"MODULOS/OTROS/NOM_005.html" },
+                { id: 5, title: "TRABAJOS EN ALTURA", link:"MODULOS/OTROS/TRABAJO_EN_ALTURAS.html" },
+		{ id: 6, title: "DISEÑO DE INTERFACES", link:"MODULOS/OTROS/DISEÑO.html"}
+            ];
+            
+            // Verificar si ya hay una sesión activa en localStorage
+            const savedUserData = localStorage.getItem('userData');
+            if (savedUserData) {
+                const userData = JSON.parse(savedUserData);
+                showMainContent(userData);
+            }
+            
+            // Función para convertir texto a mayúsculas
+            function toUpperCaseInput(event) {
+                const input = event.target;
+                const cursorPosition = input.selectionStart;
+                input.value = input.value.toUpperCase();
+                input.setSelectionRange(cursorPosition, cursorPosition);
+            }
+            
+            // Aplicar función de mayúsculas a los campos de nombre, apellido y MEP
+            document.getElementById('firstName').addEventListener('input', toUpperCaseInput);
+            document.getElementById('lastName').addEventListener('input', toUpperCaseInput);
+            document.getElementById('mep').addEventListener('input', toUpperCaseInput);
+            
+            // Validar formulario en tiempo real
+            const formInputs = loginForm.querySelectorAll('input, select');
+            formInputs.forEach(input => {
+                input.addEventListener('input', validateForm);
+            });
+            
+            // Función para validar el formulario
+            function validateForm() {
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName = document.getElementById('lastName').value.trim();
+                const mep = document.getElementById('mep').value.trim();
+                const region = document.getElementById('region').value;
+                
+                const isValid = firstName !== '' && lastName !== '' && mep !== '' && region !== '';
+                
+                loginButton.disabled = !isValid;
+                
+                return isValid;
+            }
+            
+            // Manejar el envío del formulario
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (validateForm()) {
+                    const userData = {
+                        firstName: document.getElementById('firstName').value.trim(),
+                        lastName: document.getElementById('lastName').value.trim(),
+                        mep: document.getElementById('mep').value.trim(),
+                        region: document.getElementById('region').value
+                    };
+                    
+                    // Guardar en localStorage
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    
+                    // Mostrar contenido principal
+                    showMainContent(userData);
+                } else {
+                    errorMessage.style.display = 'block';
+                }
+            });
+            
+            // Función para mostrar el contenido principal
+            function showMainContent(userData) {
+                loginContainer.style.display = 'none';
+                mainContainer.style.display = 'block';
+                
+                // Mostrar información del usuario
+                userDisplayName.textContent = `${userData.firstName} ${userData.lastName}`;
+                userMEP.textContent = userData.mep;
+                userRegion.textContent = userData.region;
+                
+                // Generar todos los módulos
+                generateModules();
+                generateTsiminModules();
+                generateSupervisionModules();
+                generateOtherModules();
+            }
+            
+            // Función para generar los módulos de Anexo Integral
+            function generateModules(filter = '') {
+                modulesGrid.innerHTML = '';
+                
+                const filteredModules = modulesData.filter(module => {
+                    const searchTerm = filter.toLowerCase();
+                    return module.title.toLowerCase().includes(searchTerm) || 
+                           module.id.toString().includes(searchTerm);
+                });
+                
+                if (filteredModules.length === 0) {
+                    modulesGrid.innerHTML = '<p style="grid-column: 1 / -1; color: #bdc3c7; text-align: center; padding: 20px;">No se encontraron módulos que coincidan con tu búsqueda.</p>';
+                    return;
+                }
+                
+                filteredModules.forEach(module => {
+                    const moduleCard = document.createElement('div');
+                    moduleCard.className = 'module-card';
+                    
+                    moduleCard.innerHTML = `
+                        <div class="module-number">${module.id}</div>
+                        <h3 class="module-title">${module.title}</h3>
+                        <a href="${module.link}" class="module-button">Acceder al módulo</a>
+                    `;
+                    
+                    modulesGrid.appendChild(moduleCard);
+                });
+            }
+            
+            // Función para generar los módulos de T-SIMIN
+            function generateTsiminModules(filter = '') {
+                tsiminModulesGrid.innerHTML = '';
+                
+                const filteredModules = tsiminModulesData.filter(module => {
+                    const searchTerm = filter.toLowerCase();
+                    return module.title.toLowerCase().includes(searchTerm) || 
+                           module.id.toString().includes(searchTerm);
+                });
+                
+                if (filteredModules.length === 0) {
+                    tsiminModulesGrid.innerHTML = '<p style="grid-column: 1 / -1; color: #bdc3c7; text-align: center; padding: 20px;">No se encontraron módulos T-SIMIN que coincidan con tu búsqueda.</p>';
+                    return;
+                }
+                
+                filteredModules.forEach(module => {
+                    const moduleCard = document.createElement('div');
+                    moduleCard.className = 'tsimin-module-card';
+                    
+                    moduleCard.innerHTML = `
+                        <div class="tsimin-module-number">${module.id}</div>
+                        <h3 class="tsimin-module-title">${module.title}</h3>
+                        <a href="${module.link}" class="tsimin-module-button">Acceder al módulo</a>
+                    `;
+                    
+                    tsiminModulesGrid.appendChild(moduleCard);
+                });
+            }
+            
+            // Función para generar los módulos de Supervisión Efectiva
+            function generateSupervisionModules(filter = '') {
+                supervisionModulesGrid.innerHTML = '';
+                
+                const filteredModules = supervisionModulesData.filter(module => {
+                    const searchTerm = filter.toLowerCase();
+                    return module.title.toLowerCase().includes(searchTerm) || 
+                           module.id.toString().includes(searchTerm);
+                });
+                
+                if (filteredModules.length === 0) {
+                    supervisionModulesGrid.innerHTML = '<p style="grid-column: 1 / -1; color: #bdc3c7; text-align: center; padding: 20px;">No se encontraron módulos que coincidan con tu búsqueda.</p>';
+                    return;
+                }
+                
+                filteredModules.forEach(module => {
+                    const moduleCard = document.createElement('div');
+                    moduleCard.className = 'supervision-module-card';
+                    
+                    moduleCard.innerHTML = `
+                        <div class="supervision-module-number">${module.id}</div>
+                        <h3 class="supervision-module-title">${module.title}</h3>
+                        <a href="${module.link}" class="supervision-module-button">Acceder al módulo</a>
+                    `;
+                    
+                    supervisionModulesGrid.appendChild(moduleCard);
+                });
+            }
+
+            // Función para generar los módulos OTROS
+            function generateOtherModules(filter = '') {
+                othersModulesGrid.innerHTML = '';
+                
+                const filteredModules = othersModulesData.filter(module => {
+                    const searchTerm = filter.toLowerCase();
+                    return module.title.toLowerCase().includes(searchTerm) || 
+                           module.id.toString().includes(searchTerm);
+                });
+                
+                if (filteredModules.length === 0) {
+                    othersModulesGrid.innerHTML = '<p style="grid-column: 1 / -1; color: #bdc3c7; text-align: center; padding: 20px;">No se encontraron módulos que coincidan con tu búsqueda.</p>';
+                    return;
+                }
+                
+                filteredModules.forEach(module => {
+                    const moduleCard = document.createElement('div');
+                    moduleCard.className = 'others-module-card';
+                    
+                    moduleCard.innerHTML = `
+                        <div class="others-module-number">${module.id}</div>
+                        <h3 class="others-module-title">${module.title}</h3>
+                        <a href="${module.link}" class="others-module-button">Acceder al módulo</a>
+                    `;
+                    
+                    othersModulesGrid.appendChild(moduleCard);
+                });
+            }
+            
+            // Manejar búsqueda de módulos de Anexo Integral
+            moduleSearch.addEventListener('input', function() {
+                generateModules(this.value);
+            });
+            
+            // Manejar búsqueda de módulos T-SIMIN
+            tsiminSearch.addEventListener('input', function() {
+                generateTsiminModules(this.value);
+            });
+            
+            // Manejar búsqueda de módulos de Supervisión Efectiva
+            supervisionSearch.addEventListener('input', function() {
+                generateSupervisionModules(this.value);
+            });
+
+            // Manejar búsqueda de módulos OTROS
+            othersSearch.addEventListener('input', function() {
+                generateOtherModules(this.value);
+            });
+            
+            // Manejar navegación entre secciones
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remover clase active de todos los items
+                    navItems.forEach(navItem => navItem.classList.remove('active'));
+                    
+                    // Agregar clase active al item clickeado
+                    this.classList.add('active');
+                    
+                    // Mostrar la sección correspondiente
+                    const section = this.getAttribute('data-section');
+                    
+                    // Ocultar todas las secciones
+                    modulesSection.style.display = 'none';
+                    tsiminSection.style.display = 'none';
+                    supervisionSection.style.display = 'none';
+                    othersSection.style.display = 'none';
+                    
+                    // Mostrar la sección seleccionada
+                    if (section === 'modules') {
+                        modulesSection.style.display = 'block';
+                    } else if (section === 'tsimin') {
+                        tsiminSection.style.display = 'block';
+                    } else if (section === 'supervision') {
+                        supervisionSection.style.display = 'block';
+                    } else if (section === 'others') {
+                        othersSection.style.display = 'block';
+                    }
+                });
+            });
+            
+            // Manejar cierre de sesión
+            logoutButton.addEventListener('click', function() {
+                localStorage.removeItem('userData');
+                mainContainer.style.display = 'none';
+                loginContainer.style.display = 'block';
+                
+                // Limpiar formulario
+                loginForm.reset();
+                loginButton.disabled = true;
+                errorMessage.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
