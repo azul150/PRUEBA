@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Sobrevivencia en el Mar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .question-number {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .user-info {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .certificate {
+            display: none;
+            border: 3px solid #3498db;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            background-color: white;
+        }
+        .certificate h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .certificate-info {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .certificate-footer {
+            text-align: left;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 30px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .download-btn {
+            background-color: #27ae60;
+            margin-top: 15px;
+        }
+        .download-btn:hover {
+            background-color: #219653;
+        }
+        
+        /* Estilos para preguntas bloqueadas */
+        .options label.disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        input:disabled {
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EVALUACIÓN DE: SOBREVIVENCIA EN EL MAR</h1>
+        
+        <div id="userInfo" class="user-info" style="display: none;">
+            <p><strong>Usuario:</strong> <span id="userDisplayName"></span></p>
+            <p><strong>MEP:</strong> <span id="userMEP"></span></p>
+            <p><strong>Región:</strong> <span id="userRegion"></span></p>
+        </div>
+        
+        <div id="evaluationSection">
+            <p><strong>Instrucción:</strong> Lee con atención y señala la respuesta correcta. Para las preguntas de selección múltiple, marca todas las opciones que apliquen.</p>
+            <p><strong>Nota:</strong> La evaluación consta de 5 preguntas que aparecerán en orden aleatorio cada vez que realices la evaluación.</p>
+            
+            <form id="evaluationForm">
+                </form>
+            
+             <div style="text-align: center; margin-top: 20px;">
+                <button type="button" id="gradeBtn" disabled>Calificar Evaluación</button>
+            </div>
+
+            <div id="result" class="result" style="display: none;"></div>
+            
+            <div id="certificate" class="certificate">
+                <h2>Comprobante de finalización del curso</h2>
+                <h3>Sobrevivencia en el Mar</h3>
+                
+                <div class="certificate-info">
+                    <p><strong>Nombre del usuario:</strong> <span id="certUserName"></span></p>
+                    <p><strong>MEP:</strong> <span id="certMEP"></span></p>
+                    <p><strong>Fecha de finalización:</strong> <span id="certDate"></span></p>
+                </div>
+                
+                <div class="certificate-footer">
+                    <p>Este comprobante no tiene valor oficial y solo puede ser canjeado en el Área de Capacitación</p>
+                </div>
+                
+                <button class="download-btn" id="downloadBtn">Descargar Comprobante</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de preguntas y respuestas actualizada con las del archivo
+        const questionsDatabase = [
+            {
+                id: 1,
+                question: "¿Cuáles son los factores de sobrevivencia controlables? (Selección múltiple)",
+                options: [
+                    "a) Acciones de la tripulación",
+                    "b) Uso adecuado del equipo",
+                    "c) Técnicas de sobrevivencia",
+                    "d) La ubicación geográfica del accidente"
+                ],
+                // Según el documento, la ubicación es un factor externo, los otros son controlables [cite: 3, 4, 5]
+                correctAnswer: ['a', 'b', 'c'] 
+            },
+            {
+                id: 2,
+                question: "¿Cuáles son los factores de sobrevivencia NO controlables?",
+                options: [
+                    "a) La suerte",
+                    "b) La condición física",
+                    "c) Ayuda exterior",
+                    "d) Condiciones atmosféricas",
+                    "e) Todas las anteriores"
+                ],
+                correctAnswer: 'e' 
+            },
+            {
+                id: 3,
+                question: "¿Cuál es el diámetro exterior que debe tener un aro salvavidas?",
+                options: [
+                    "a) No mayor de 80 cm",
+                    "b) Menor a 50 cm",
+                    "c) 70 cm",
+                    "d) Mayor que 90 cm"
+                ],
+                correctAnswer: 'a' 
+            },
+            {
+                id: 4,
+                question: "En cuantos tipos se clasifican los chalecos salvavidas USGC:",
+                options: [
+                    "a) 3",
+                    "b) 6",
+                    "c) 8",
+                    "d) 5"
+                ],
+                correctAnswer: 'd' 
+            },
+            {
+                id: 5,
+                question: "¿Cuál es la intensidad de Cd de las bengalas de mano solas?",
+                options: [
+                    "a) 10,000",
+                    "b) 15,000",
+                    "c) 5,000",
+                    "d) 12,000"
+                ],
+                correctAnswer: 'b' 
+            }
+        ];
+
+        // Variable para almacenar las preguntas aleatorias y sus respuestas correctas
+        let randomizedQuestions = [];
+        let currentCorrectAnswers = {};
+
+        // Verificar si hay una sesión activa al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUserData = localStorage.getItem('userData');
+            
+            if (savedUserData) {
+                const userData = JSON.parse(savedUserData);
+                showUserInfo(userData);
+                // Generar preguntas aleatorias después de mostrar la info del usuario
+                generateRandomQuestions();
+                
+                // Asignar evento click al botón de calificar
+                document.getElementById('gradeBtn').addEventListener('click', gradeEvaluation);
+            } else {
+                alert('No hay una sesión activa. Serás redirigido al sistema de inicio de sesión.');
+                window.location.href = 'index.html';
+            }
+        });
+        
+        // Mostrar información del usuario
+        function showUserInfo(userData) {
+            const userDisplayName = `${userData.firstName} ${userData.lastName}`;
+            
+            document.getElementById('userDisplayName').textContent = userDisplayName;
+            document.getElementById('userMEP').textContent = userData.mep;
+            document.getElementById('userRegion').textContent = userData.region;
+            document.getElementById('userInfo').style.display = 'block';
+            
+            // También establecer los datos para el certificado
+            document.getElementById('certUserName').textContent = userDisplayName;
+            document.getElementById('certMEP').textContent = userData.mep;
+        }
+
+        // Función para generar preguntas aleatorias
+        function generateRandomQuestions() {
+            // Crear una copia del array de preguntas
+            const questionsCopy = [...questionsDatabase];
+            
+            // Mezclar las preguntas aleatoriamente
+            for (let i = questionsCopy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questionsCopy[i], questionsCopy[j]] = [questionsCopy[j], questionsCopy[i]];
+            }
+            
+            // Tomar solo las 5 preguntas disponibles
+            randomizedQuestions = questionsCopy.slice(0, 5);
+            
+            // Reconstruir el objeto de respuestas correctas con las nuevas preguntas
+            currentCorrectAnswers = {};
+            randomizedQuestions.forEach((question, index) => {
+                currentCorrectAnswers[`q${index + 1}`] = question.correctAnswer;
+            });
+            
+            // Renderizar las preguntas en el formulario
+            renderQuestions();
+        }
+
+        // Función para renderizar las preguntas en el formulario
+        function renderQuestions() {
+            const form = document.getElementById('evaluationForm');
+            
+            // Limpiar el formulario
+            form.innerHTML = '';
+            
+            // Agregar cada pregunta al formulario
+            randomizedQuestions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.textContent = `${index + 1}. ${question.question}`;
+                
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+                
+                question.options.forEach((option, optionIndex) => {
+                    const letter = String.fromCharCode(97 + optionIndex); // a, b, c, etc.
+                    
+                    const label = document.createElement('label');
+                    const input = document.createElement('input');
+                    
+                    // Para preguntas con múltiples respuestas correctas (array), usar checkbox
+                    if (Array.isArray(question.correctAnswer)) {
+                        input.type = 'checkbox';
+                        input.name = `q${index + 1}_${letter}`;
+                    } else {
+                        input.type = 'radio';
+                        input.name = `q${index + 1}`;
+                    }
+                    
+                    input.value = letter;
+                    
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(` ${option}`));
+                    optionsDiv.appendChild(label);
+                });
+                
+                questionDiv.appendChild(questionNumber);
+                questionDiv.appendChild(optionsDiv);
+                form.appendChild(questionDiv);
+            });
+            
+            // Re-asignar event listeners a los inputs para habilitar el botón de calificar
+            document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
+                input.addEventListener('change', function() {
+                    const allAnswered = checkAllQuestionsAnswered();
+                    document.getElementById('gradeBtn').disabled = !allAnswered;
+                });
+            });
+        }
+        
+        // Verificar si todas las preguntas han sido respondidas
+        function checkAllQuestionsAnswered() {
+            for (let i = 1; i <= randomizedQuestions.length; i++) {
+                const questionName = 'q' + i;
+                const question = randomizedQuestions[i-1];
+                
+                // Para preguntas con múltiples respuestas correctas, verificar que al menos una opción esté seleccionada
+                if (Array.isArray(question.correctAnswer)) {
+                    const selectedOptions = document.querySelectorAll(`input[name^="${questionName}_"]:checked`);
+                    if (selectedOptions.length === 0) {
+                        return false;
+                    }
+                } else {
+                    // Para preguntas de una sola respuesta
+                    const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+                    if (!selectedOption) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        
+        // Función para bloquear todas las preguntas después de calificar
+        function lockQuestionsAfterGrading() {
+            // Seleccionar todos los inputs de preguntas (radio buttons y checkboxes)
+            const allInputs = document.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+            
+            // Deshabilitar todos los inputs
+            allInputs.forEach(input => {
+                input.disabled = true;
+            });
+            
+            // También podemos cambiar el estilo visual para indicar que están bloqueados
+            const allLabels = document.querySelectorAll('.options label');
+            allLabels.forEach(label => {
+                label.style.opacity = '0.7';
+                label.style.cursor = 'not-allowed';
+            });
+            
+            // Deshabilitar el botón de calificar también
+            const gradeBtn = document.getElementById('gradeBtn');
+            if (gradeBtn) {
+                gradeBtn.disabled = true;
+                gradeBtn.textContent = 'Evaluación Completada';
+                gradeBtn.style.backgroundColor = '#95a5a6';
+            }
+        }
+        
+        // Calificar evaluación
+        function gradeEvaluation() {
+            let score = 0;
+            const totalQuestions = randomizedQuestions.length;
+            
+            for (let i = 1; i <= totalQuestions; i++) {
+                const questionName = 'q' + i;
+                const correctAnswer = currentCorrectAnswers[questionName];
+                
+                // Para preguntas con múltiples respuestas correctas
+                if (Array.isArray(correctAnswer)) {
+                    let userAnswer = [];
+                    const selectedOptions = document.querySelectorAll(`input[name^="${questionName}_"]:checked`);
+                    
+                    selectedOptions.forEach(option => {
+                        userAnswer.push(option.value);
+                    });
+                    
+                    // Ordenar ambas respuestas para comparar (convertir a string)
+                    const sortedUserAnswer = userAnswer.sort().join('');
+                    const sortedCorrectAnswer = correctAnswer.sort().join('');
+                    
+                    if (sortedUserAnswer === sortedCorrectAnswer) {
+                        score++;
+                    }
+                } else {
+                    // Para preguntas de una sola respuesta
+                    const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+                    
+                    if (selectedOption && selectedOption.value === correctAnswer) {
+                        score++;
+                    }
+                }
+            }
+            
+            const percentage = (score / totalQuestions) * 100;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = `Obtuviste ${score} de ${totalQuestions} respuestas correctas (${percentage.toFixed(2)}%)`;
+            
+            // BLOQUEAR PREGUNTAS DESPUÉS DE CALIFICAR
+            lockQuestionsAfterGrading();
+            enviarCalificacionGoogle(score, percentage);
+            if (percentage >= 80) {
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML += '<br>¡Felicidades! Has aprobado la evaluación.';
+                
+                // Mostrar certificado
+                document.getElementById('certDate').textContent = new Date().toLocaleDateString();
+                document.getElementById('certificate').style.display = 'block';
+                
+                // Guardar el resultado en localStorage
+                saveEvaluationResult(score, percentage);
+            } else {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML += '<br>No has alcanzado el 80% necesario para aprobar. Inténtalo de nuevo.';
+                document.getElementById('certificate').style.display = 'none';
+                
+                // Borrar el progreso del PDF para que tenga que leer de nuevo
+                deletePDFProgress();
+                
+                // Redirigir después de 3 segundos
+                setTimeout(function() {
+                    alert('Tu progreso del PDF ha sido reiniciado. Debes revisar el material nuevamente antes de intentar el examen otra vez.');
+                    window.location.href = '../../index.html';
+                }, 3000);
+            }
+        }
+        
+        // Guardar resultado de la evaluación
+        function saveEvaluationResult(score, percentage) {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            
+            if (!userData.evaluations) {
+                userData.evaluations = {};
+            }
+            
+            userData.evaluations['sobrevivencia_mar'] = {
+                score: score,
+                percentage: percentage,
+                date: new Date().toISOString(),
+                passed: percentage >= 80
+            };
+            
+            localStorage.setItem('userData', JSON.stringify(userData));
+        }
+        
+        // Función para eliminar el progreso del PDF
+        function deletePDFProgress() {
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    // Crear el ID único igual que en el visor de PDF
+                    const userId = `${user.firstName}_${user.lastName}_${user.mep}`.replace(/\s+/g, '_').toUpperCase();
+                    
+                    // Eliminar específicamente el progreso del PDF del Módulo 27
+                    localStorage.removeItem(`pdfProgress_${userId}_MODULO_27`);
+                    
+                    console.log('Progreso del PDF eliminado para forzar nueva lectura');
+                } catch (e) {
+                    console.error('Error al eliminar progreso del PDF:', e);
+                }
+            }
+        }
+        
+        // ==========================
+        // DESCARGA DE COMPROBANTE
+        // ==========================
+        document.getElementById('downloadBtn').addEventListener('click', function(){
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if(!userData) {
+                alert('Error: No se encontró información del usuario.');
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 1000;
+            canvas.height = 700;
+            const ctx = canvas.getContext('2d');
+
+            // Fondo con gradiente
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, "#f0f8ff");
+            gradient.addColorStop(1, "#ffffff");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Borde azul
+            ctx.strokeStyle = "#3498db";
+            ctx.lineWidth = 8;
+            ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+
+            // Título con texto más remarcado
+            ctx.fillStyle = "#2c3e50";
+            ctx.font = "bold 38px Georgia";
+            ctx.textAlign = "center";
+            ctx.fillText("Comprobante de Finalización del Curso:", canvas.width/2, 120);
+            
+            // Dividir el título del curso en dos líneas para mejor presentación
+            ctx.font = "bold 34px Georgia";
+            ctx.fillText("Sobrevivencia en el Mar", canvas.width/2, 170);
+
+            // Texto descriptivo con texto más remarcado
+            ctx.font = "bold 30px Arial";
+            ctx.fillStyle = "#000";
+            ctx.fillText("Se otorga el presente comprobante a:", canvas.width/2, 270); 
+
+            // Nombre del usuario con texto más remarcado
+            ctx.font = "bold 36px 'Times New Roman'";
+            ctx.fillStyle = "#3498db";
+            const userName = `${userData.firstName} ${userData.lastName}`;
+            ctx.fillText(userName.toUpperCase(), canvas.width/2, 340); 
+
+            // Información adicional con texto más remarcado
+            ctx.font = "bold 26px Arial";
+            ctx.fillStyle = "#333";
+            ctx.fillText(`MEP: ${userData.mep}`, canvas.width/2, 420); 
+            ctx.fillText(`Finalizado el: ${new Date().toLocaleDateString()}`, canvas.width/2, 480); 
+
+            // Cargar y dibujar el logo en el centro
+            const logo = new Image();
+            logo.onload = function() {
+                // Dibujar el logo con opacidad reducida y tamaño aumentado
+                ctx.globalAlpha = 0.3;
+                const logoSize = 500;
+                const logoX = (canvas.width - logoSize) / 2;
+                const logoY = (canvas.height - logoSize) / 2;
+                ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+                ctx.globalAlpha = 1.0;
+
+                // Leyenda inferior con texto más remarcado
+                ctx.font = "bold italic 18px Arial";
+                ctx.fillStyle = "#666";
+                ctx.textAlign = "left";
+                ctx.fillText("El comprobante no tiene validez legal y para la elaboración y", 60, 600);
+                ctx.fillText("entrega de DC-3, favor de presentar este documento en el área de capacitación.", 60, 620);
+
+                // Crear y descargar la imagen
+                const link = document.createElement('a');
+                link.download = `Comprobante_${userName.toUpperCase()}_Sobrevivencia_Mar.jpg`;
+                link.href = canvas.toDataURL('image/jpeg');
+                link.click();
+                
+                // Borrar el progreso del PDF después de descargar el comprobante
+                deletePDFProgress();
+                
+                // Redirigir automáticamente después de descargar el comprobante
+                setTimeout(function() {
+                    window.location.href = '../../index.html';
+                }, 1000);
+            };
+            
+            // Si hay un error al cargar el logo, continuar sin él
+            logo.onerror = function() {
+                console.log("Error al cargar el logo, generando comprobante sin logo");
+                
+                // Leyenda inferior con texto más remarcado
+                ctx.font = "bold italic 18px Arial";
+                ctx.fillStyle = "#666";
+                ctx.textAlign = "left";
+                ctx.fillText("El comprobante no tiene validez legal y para la elaboración y", 60, 600);
+                ctx.fillText("entrega de DC-3, favor de presentar este documento en el área de capacitación.", 60, 620);
+
+                // Crear y descargar la imagen
+                const link = document.createElement('a');
+                link.download = `Comprobante_${userName.toUpperCase()}_Sobrevivencia_Mar.jpg`;
+                link.href = canvas.toDataURL('image/jpeg');
+                link.click();
+                
+                // Borrar el progreso del PDF después de descargar el comprobante
+                deletePDFProgress();
+                
+                // Redirigir automáticamente después de descargar el comprobante
+                setTimeout(function() {
+                    window.location.href = '../../index.html';
+                }, 1000);
+            };
+            
+            // Cargar el logo
+            logo.src = 'logo.svg';
+        });
+    </script>
+    <script>
+        // ==========================================
+//  CONFIGURACIÓN DE ENVÍO A GOOGLE SHEETS
+// ==========================================
+
+// 1. Pega aquí la URL de tu Web App de Google Apps Script
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyPGOdBsfdrWOhip_--aoNOMFHET86FRdewFhtL78IPHc3adkq91Pv0i8tfuysI7B0PFw/exec'; 
+
+// 2. Define el nombre del módulo ACTUAL. 
+// IMPORTANTE: Debe contener el número del módulo (ej: "05" o "5") para que el script sepa en qué columna ponerlo.
+const NOMBRE_MODULO = "Módulo 27"; 
+
+/**
+ * Función para enviar la calificación a Google Sheets
+ * @param {number} score - Puntaje obtenido (ej: 4)
+ * @param {number} percentage - Porcentaje obtenido (ej: 80)
+ */
+function enviarCalificacionGoogle(score, percentage) {
+    // Recuperar datos del usuario guardados en el Login
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    
+    if (!userData) {
+        console.error("No hay datos de usuario para enviar.");
+        return;
+    }
+
+    // Preparar los datos para enviar
+    const formData = new FormData();
+    formData.append('nombre', userData.firstName + ' ' + userData.lastName);
+    formData.append('mep', userData.mep);
+    formData.append('region', userData.region);
+    formData.append('modulo', NOMBRE_MODULO);
+    formData.append('calificacion', score); 
+    formData.append('porcentaje', percentage.toFixed(0) + '%'); 
+
+    console.log("Enviando datos a Google Sheets...", Object.fromEntries(formData));
+
+    // Enviar usando fetch (POST)
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Éxito al guardar en Google Sheets:', data);
+        if(data.result === "success") {
+            console.log("Fila actualizada: " + data.row);
+        }
+    })
+    .catch(error => {
+        console.error('Error al enviar a Google Sheets:', error);
+    });
+}
+    </script>
+</body>
+</html>

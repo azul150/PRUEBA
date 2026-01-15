@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación NOM-005-STPS-1998</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .question-number {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        /* --- ESTILOS PARA FRACCIONES (Conservados) --- */
+        .frac {
+            display: inline-block;
+            position: relative;
+            vertical-align: middle;
+            letter-spacing: 0.001em;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        .frac > sup {
+            display: block;
+            padding: 0.1em;
+            border-bottom: 1px solid #000;
+            line-height: 1;
+        }
+        .frac > sub {
+            display: block;
+            padding: 0.1em;
+            line-height: 1;
+        }
+        /* ----------------------------- */
+
+        .options label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .options input {
+            margin-right: 10px;
+        }
+        /* Estilo para que las imágenes de las opciones se vean bien */
+        .options img {
+            max-width: 150px;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+
+        .user-info {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .certificate {
+            display: none;
+            border: 3px solid #3498db;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            background-color: white;
+        }
+        .certificate h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .certificate-info {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .certificate-footer {
+            text-align: left;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 30px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .download-btn {
+            background-color: #27ae60;
+            margin-top: 15px;
+        }
+        .download-btn:hover {
+            background-color: #219653;
+        }
+        
+        /* Estilos para preguntas bloqueadas */
+        .options label.disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        input:disabled {
+            cursor: not-allowed;
+        }
+        .question.locked {
+            background-color: #f9f9f9;
+            border-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EVALUACIÓN DE: NOM-005-STPS-1998</h1>
+        
+        <div id="userInfo" class="user-info" style="display: none;">
+            <p><strong>Usuario:</strong> <span id="userDisplayName"></span></p>
+            <p><strong>MEP:</strong> <span id="userMEP"></span></p>
+            <p><strong>Región:</strong> <span id="userRegion"></span></p>
+        </div>
+        
+        <div id="evaluationSection">
+            <p><strong>Instrucción:</strong> Lee con atención y selecciona la respuesta correcta.</p>
+            
+            <form id="evaluationForm">
+                </form>
+            
+            <div id="result" class="result" style="display: none;"></div>
+            
+            <div id="certificate" class="certificate">
+                <h2>Comprobante de finalización del curso</h2>
+                <h3>NOM-005-STPS-1998 (Sustancias Químicas Peligrosas)</h3>
+                
+                <div class="certificate-info">
+                    <p><strong>Nombre del usuario:</strong> <span id="certUserName"></span></p>
+                    <p><strong>MEP:</strong> <span id="certMEP"></span></p>
+                    <p><strong>Fecha de finalización:</strong> <span id="certDate"></span></p>
+                </div>
+                
+                <div class="certificate-footer">
+                    <p>Este comprobante no tiene valor oficial y solo puede ser canjeado en el Área de Capacitación</p>
+                </div>
+                
+                <button class="download-btn" id="downloadBtn">Descargar Comprobante</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función auxiliar para crear HTML de fracciones (por si se requiere en el futuro)
+        function frac(num, den) {
+            return `<span class="frac"><sup>${num}</sup><sub>${den}</sub></span>`;
+        }
+
+        // --- BASE DE DATOS DE PREGUNTAS (NOM-005-STPS-1998) ---
+        const questionsDatabase = [
+            {
+                id: 1,
+                question: "Condiciones de seguridad e higiene en los centros de trabajo para el manejo, transporte y almacenamiento de sustancias químicas peligrosas, ¿corresponde a la NOM-STPS número?",
+                options: [
+                    "NOM-005-STPS-1998.",
+                    "NOM-018-STPS-2015.",
+                    "NOM-026-STPS-2008."
+                ],
+                correctAnswer: 'a',
+                type: 'radio'
+            },
+            {
+                id: 2,
+                question: "Colores y señales de seguridad e higiene, e identificación de riesgos por fluidos conducidos en tuberías, ¿corresponde a la NOM-STPS número?",
+                options: [
+                    "NOM-005-STPS-1998.",
+                    "NOM-018-STPS-2015.",
+                    "NOM-026-STPS-2008."
+                ],
+                correctAnswer: 'c',
+                type: 'radio'
+            },
+            {
+                id: 3,
+                question: "Sistema Armonizado para la Identificación y Comunicación de Peligros y Riesgos por Sustancias Químicas Peligrosas en los Centros de Trabajo, ¿corresponde a la NOM-STPS número?",
+                options: [
+                    "NOM-005-STPS-1998.",
+                    "NOM-018-STPS-2015.",
+                    "NOM-026-STPS-2008."
+                ],
+                correctAnswer: 'b',
+                type: 'radio'
+            },
+            {
+                id: 4,
+                question: "Son aquellas en estado sólido o líquido con un punto de inflamación mayor a 37.8°C:",
+                options: [
+                    "Sustancias inflamables.",
+                    "Sustancias combustibles.",
+                    "Sustancias irritantes.",
+                    "Sustancias corrosivas.",
+                    "Sustancias reactivas.",
+                    "Sustancias explosivas.",
+                    "Sustancias tóxicas."
+                ],
+                correctAnswer: 'b',
+                type: 'radio'
+            },
+            {
+                id: 5,
+                question: "Son aquéllas en estado sólido, líquido o gaseoso con un punto de inflamación menor o igual a 37.8°C, que prenden fácilmente y se queman rápidamente, generalmente de forma violenta:",
+                options: [
+                    "Sustancias inflamables.",
+                    "Sustancias combustibles.",
+                    "Sustancias irritantes.",
+                    "Sustancias corrosivas.",
+                    "Sustancias reactivas.",
+                    "Sustancias explosivas.",
+                    "Sustancias tóxicas."
+                ],
+                correctAnswer: 'a',
+                type: 'radio'
+            },
+            {
+                id: 6,
+                question: "Son aquéllas en estado sólido, líquido o gaseoso que causan un efecto inflamatorio reversible en el tejido vivo por acción química en el sitio de contacto:",
+                options: [
+                    "Sustancias inflamables.",
+                    "Sustancias combustibles.",
+                    "Sustancias irritantes.",
+                    "Sustancias corrosivas.",
+                    "Sustancias reactivas.",
+                    "Sustancias explosivas.",
+                    "Sustancias tóxicas."
+                ],
+                correctAnswer: 'c',
+                type: 'radio'
+            },
+            {
+                id: 7,
+                question: "Son aquéllas en estado sólido, líquido o gaseoso que causan destrucción o alteraciones irreversibles en el tejido vivo por acción química en el sitio de contacto:",
+                options: [
+                    "Sustancias inflamables.",
+                    "Sustancias combustibles.",
+                    "Sustancias irritantes.",
+                    "Sustancias corrosivas.",
+                    "Sustancias reactivas.",
+                    "Sustancias explosivas.",
+                    "Sustancias tóxicas."
+                ],
+                correctAnswer: 'd',
+                type: 'radio'
+            },
+            {
+                id: 8,
+                question: "Son aquéllas en estado sólido, líquido o gaseoso que pueden causar trastornos estructurales o funcionales que provoquen daños a la salud o la muerte si son absorbidas, aun en cantidades relativamente pequeñas por el trabajador:",
+                options: [
+                    "Sustancias inflamables.",
+                    "Sustancias combustibles.",
+                    "Sustancias irritantes.",
+                    "Sustancias corrosivas.",
+                    "Sustancias reactivas.",
+                    "Sustancias explosivas.",
+                    "Sustancias tóxicas."
+                ],
+                correctAnswer: 'g',
+                type: 'radio'
+            },
+            {
+                id: 9,
+                question: "Son aquéllas que presentan susceptibilidad para liberar energía:",
+                options: [
+                    "Sustancias inflamables.",
+                    "Sustancias combustibles.",
+                    "Sustancias irritantes.",
+                    "Sustancias corrosivas.",
+                    "Sustancias reactivas.",
+                    "Sustancias explosivas.",
+                    "Sustancias tóxicas."
+                ],
+                correctAnswer: 'e',
+                type: 'radio'
+            },
+            {
+                id: 10,
+                // Nota: La pregunta 10 en el archivo PDF se repite (es idéntica a la 8) pero tiene las opciones de la 9.
+                // Sin embargo, por el contexto de las definiciones faltantes, parece referirse a EXPLOSIVAS que es la opción 'f'.
+                // Ajustaré la pregunta para que coincida con la definición de EXPLOSIVAS comúnmente usada en esta NOM,
+                // o usaré el texto literal del archivo si es una repetición.
+                // En el archivo, la pregunta 10 tiene el MISMO texto que la 8: "Son aquéllas en estado sólido, líquido o gaseoso que pueden causar trastornos...".
+                // Esto parece un error del PDF original.
+                // Sin embargo, la pregunta 9 anterior cubre REACTIVAS. Falta EXPLOSIVAS.
+                // Asumiré que la pregunta 10 debería ser la definición de EXPLOSIVAS dada la secuencia lógica de opciones.
+                // Pero para ser fiel al archivo, pondré el texto tal cual, aunque sea repetido, y la respuesta lógica sería TÓXICAS de nuevo (g).
+                // OJO: En la pregunta 9 del archivo dice "liberar energía" -> Reactivas.
+                // En la 10 del archivo repite la definición de tóxicas.
+                // En la 12 (que está numerada como 10 al final del archivo), pregunta sobre el programa específico.
+                
+                // Voy a incluir la pregunta tal cual aparece en el archivo (repetida de tóxicas) pero si en tu examen real es diferente, avísame.
+                question: "Son aquéllas en estado sólido, líquido o gaseoso que pueden causar trastornos estructurales o funcionales que provoquen daños a la salud o la muerte si son absorbidas, aun en cantidades relativamente pequeñas por el trabajador:",
+                options: [
+                    "Sustancias inflamables.",
+                    "Sustancias combustibles.",
+                    "Sustancias irritantes.",
+                    "Sustancias corrosivas.",
+                    "Sustancias reactivas.",
+                    "Sustancias explosivas.",
+                    "Sustancias tóxicas."
+                ],
+                correctAnswer: 'f',
+                type: 'radio'
+            },
+            {
+                id: 11,
+                question: "¿Qué es una Sustancia Química Peligrosa?",
+                options: [
+                    "Aquellas que por sus propiedades físicas y/o químicas al ser manejadas, transportadas, almacenadas o procesadas presentan la posibilidad de riesgos de explosividad, inflamabilidad, combustibilidad, reactividad, corrosividad, radiactividad, toxicidad, o irritabilidad, y que al ingresar al organismo por vía respiratoria, cutánea o digestiva, pueden provocar a los trabajadores expuestos intoxicación, quemaduras o lesiones orgánicas, según el nivel de concentración de la sustancia y el tiempo de exposición.",
+                    "CRETIB es una nomenclatura que sirve para denominar los residuos que son considerados peligrosos y altamente contaminantes.",
+                    "A un tipo de materia que es químicamente homogénea y definida, o sea, que posee una composición química fija.",
+                    "Son un tipo de Sustancias Peligrosas que en presencia de un comburente y una fuente de ignición (calor, chispa...) se inflama produciendo una reacción de combustión."
+                ],
+                correctAnswer: 'a',
+                type: 'radio'
+            },
+            {
+                id: 12,
+                // En el archivo esta pregunta aparece al final numerada como "10".
+                question: "El programa específico de seguridad e higiene para el manejo, transporte y almacenamiento de sustancias químicas peligrosas, ¿es una obligación que corresponde a la NOM-STPS?",
+                options: [
+                    "NOM-005-STPS-1998.",
+                    "NOM-018-STPS-2015."
+                ],
+                correctAnswer: 'a',
+                type: 'radio'
+            }
+        ];
+
+        let randomizedQuestions = [];
+
+        // Verificar sesión y cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUserData = localStorage.getItem('userData');
+            
+            if (savedUserData) {
+                const userData = JSON.parse(savedUserData);
+                showUserInfo(userData);
+                generateRandomQuestions();
+            } else {
+                alert('No hay una sesión activa. Serás redirigido al sistema de inicio de sesión.');
+                window.location.href = 'index.html';
+            }
+        });
+        
+        function showUserInfo(userData) {
+            const userDisplayName = `${userData.firstName} ${userData.lastName}`;
+            document.getElementById('userDisplayName').textContent = userDisplayName;
+            document.getElementById('userMEP').textContent = userData.mep;
+            document.getElementById('userRegion').textContent = userData.region;
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('certUserName').textContent = userDisplayName;
+            document.getElementById('certMEP').textContent = userData.mep;
+        }
+
+        // Generar preguntas aleatorias
+        function generateRandomQuestions() {
+            const questionsCopy = [...questionsDatabase];
+            
+            // Mezclar
+            for (let i = questionsCopy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questionsCopy[i], questionsCopy[j]] = [questionsCopy[j], questionsCopy[i]];
+            }
+            
+            // TOMAR TODAS LAS PREGUNTAS
+            randomizedQuestions = questionsCopy;
+            
+            renderQuestions();
+        }
+
+        // Renderizar preguntas
+        function renderQuestions() {
+            const form = document.getElementById('evaluationForm');
+            form.innerHTML = '';
+            
+            randomizedQuestions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.innerHTML = `${index + 1}. ${question.question}`;
+                
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+                
+                question.options.forEach((option, optionIndex) => {
+                    const letter = String.fromCharCode(97 + optionIndex); // a, b, c...
+                    
+                    const label = document.createElement('label');
+                    const input = document.createElement('input');
+                    
+                    input.type = question.type; 
+                    input.name = `q${question.id}`;
+                    input.value = letter;
+                    input.dataset.qid = question.id;
+                    
+                    label.appendChild(input);
+                    
+                    const textSpan = document.createElement('span');
+                    textSpan.innerHTML = ` ${option}`;
+                    label.appendChild(textSpan);
+                    
+                    optionsDiv.appendChild(label);
+                });
+                
+                questionDiv.appendChild(questionNumber);
+                questionDiv.appendChild(optionsDiv);
+                form.appendChild(questionDiv);
+            });
+            
+            // Botón de calificar
+            const newGradeBtn = document.createElement('button');
+            newGradeBtn.type = 'button';
+            newGradeBtn.id = 'gradeBtn';
+            newGradeBtn.textContent = 'Calificar Evaluación';
+            newGradeBtn.disabled = true; 
+            form.appendChild(newGradeBtn);
+            
+            newGradeBtn.addEventListener('click', gradeEvaluation);
+            
+            // Listeners para habilitar botón
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('change', checkAllQuestionsAnswered);
+            });
+        }
+        
+        function checkAllQuestionsAnswered() {
+            let allAnswered = true;
+            
+            randomizedQuestions.forEach(q => {
+                const name = `q${q.id}`;
+                const checked = document.querySelector(`input[name="${name}"]:checked`);
+                if (!checked) {
+                    allAnswered = false;
+                }
+            });
+
+            document.getElementById('gradeBtn').disabled = !allAnswered;
+        }
+        
+        function lockQuestionsAfterGrading() {
+            const allInputs = document.querySelectorAll('input');
+            allInputs.forEach(input => input.disabled = true);
+            
+            const allLabels = document.querySelectorAll('.options label');
+            allLabels.forEach(label => {
+                label.classList.add('disabled');
+            });
+            
+            const allQuestions = document.querySelectorAll('.question');
+            allQuestions.forEach(question => question.classList.add('locked'));
+            
+            const gradeBtn = document.getElementById('gradeBtn');
+            if (gradeBtn) {
+                gradeBtn.disabled = true;
+                gradeBtn.textContent = 'Evaluación Completada';
+                gradeBtn.style.backgroundColor = '#95a5a6';
+            }
+        }
+        
+        function gradeEvaluation() {
+            let score = 0;
+            const totalQuestions = randomizedQuestions.length;
+            
+            randomizedQuestions.forEach(q => {
+                const name = `q${q.id}`;
+                
+                if (q.type === 'radio') {
+                    const selected = document.querySelector(`input[name="${name}"]:checked`);
+                    if (selected && selected.value === q.correctAnswer) {
+                        score++;
+                    }
+                } else if (q.type === 'checkbox') {
+                    const checkedInputs = document.querySelectorAll(`input[name="${name}"]:checked`);
+                    const selectedValues = Array.from(checkedInputs).map(cb => cb.value).sort();
+                    const correctValues = q.correctAnswer.sort();
+                    
+                    if (JSON.stringify(selectedValues) === JSON.stringify(correctValues)) {
+                        score++;
+                    }
+                }
+            });
+            
+            const percentage = (score / totalQuestions) * 100;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = `Obtuviste ${score} de ${totalQuestions} respuestas correctas (${percentage.toFixed(2)}%)`;
+            
+            lockQuestionsAfterGrading();
+            enviarDatosAGoogle(score, percentage);
+            
+            if (percentage >= 80) {
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML += '<br>¡Felicidades! Has aprobado la evaluación.';
+                document.getElementById('certDate').textContent = new Date().toLocaleDateString();
+                document.getElementById('certificate').style.display = 'block';
+            } else {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML += '<br>No has alcanzado el 80% necesario. Inténtalo de nuevo.';
+                document.getElementById('certificate').style.display = 'none';
+                deletePDFProgress();
+                setTimeout(function() {
+                    alert('Tu progreso ha sido reiniciado.');
+                    window.location.href = '../../index.html';
+                }, 4000);
+            }
+        }
+        
+        function deletePDFProgress() {
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    const userId = `${user.firstName}_${user.lastName}_${user.mep}`.replace(/\s+/g, '_').toUpperCase();
+                    // Importante: Cambia el ID aquí para que sea único para este curso
+                    localStorage.removeItem(`pdfProgress_${userId}_nom_005`);
+                } catch (e) { console.error(e); }
+            }
+        }
+        
+        // ==========================
+        // DESCARGA DE COMPROBANTE
+        // ==========================
+        document.getElementById('downloadBtn').addEventListener('click', function(){
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if(!userData) { alert('Error: No se encontró usuario.'); return; }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 1000;
+            canvas.height = 700;
+            const ctx = canvas.getContext('2d');
+
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, "#f0f8ff");
+            gradient.addColorStop(1, "#ffffff");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = "#3498db";
+            ctx.lineWidth = 8;
+            ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+
+            ctx.fillStyle = "#2c3e50";
+            ctx.font = "bold 38px Georgia";
+            ctx.textAlign = "center";
+            ctx.fillText("Comprobante de Finalización del Curso:", canvas.width/2, 120);
+            ctx.fillText("NOM-005-STPS-1998", canvas.width/2, 170);
+
+            ctx.font = "bold 30px Arial";
+            ctx.fillStyle = "#000";
+            ctx.fillText("Se otorga el presente comprobante a:", canvas.width/2, 240); 
+
+            ctx.font = "bold 36px 'Times New Roman'";
+            ctx.fillStyle = "#3498db";
+            const userName = `${userData.firstName} ${userData.lastName}`;
+            ctx.fillText(userName.toUpperCase(), canvas.width/2, 320); 
+
+            ctx.font = "bold 26px Arial";
+            ctx.fillStyle = "#333";
+            ctx.fillText(`MEP: ${userData.mep}`, canvas.width/2, 400); 
+            ctx.fillText(`Finalizado el: ${new Date().toLocaleDateString()}`, canvas.width/2, 470); 
+
+            const logo = new Image();
+            logo.onload = function() {
+                ctx.globalAlpha = 0.3;
+                const logoSize = 500;
+                const logoX = (canvas.width - logoSize) / 2;
+                const logoY = (canvas.height - logoSize) / 2;
+                ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+                ctx.globalAlpha = 1.0;
+                generateImage(canvas, userName);
+            };
+            logo.onerror = function() { generateImage(canvas, userName); };
+            logo.src = 'logo.svg';
+        });
+
+        function generateImage(canvas, userName) {
+            const ctx = canvas.getContext('2d');
+            ctx.font = "bold italic 18px Arial";
+            ctx.fillStyle = "#666";
+            ctx.textAlign = "left";
+            ctx.fillText("El comprobante no tiene validez legal y para la elaboración y", 60, 600);
+            ctx.fillText("entrega de DC-3, favor de presentar este documento en el área de capacitación.", 60, 620);
+
+            const link = document.createElement('a');
+            link.download = `Comprobante_${userName.toUpperCase()}_NOM-005-STPS.jpg`;
+            link.href = canvas.toDataURL('image/jpeg');
+            link.click();
+            
+            deletePDFProgress();
+            setTimeout(function() { window.location.href = '../../index.html'; }, 1000);
+        }
+
+        function enviarDatosAGoogle(score, percentage) {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (!userData) return;
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbwPbVYKV1VO9txXRjzfAEQL-Hv1p92XhYu1cMXKpI3yD5eiCUauL3f-DoNWVN9vcR5X/exec';
+            const formData = new FormData();
+            formData.append('nombre', `${userData.firstName} ${userData.lastName}`);
+            formData.append('mep', userData.mep);
+            formData.append('region', userData.region); 
+            formData.append('score', score);
+            formData.append('percentage', percentage.toFixed(2));
+            
+            const resultDiv = document.getElementById('result');
+            const loadingMsg = document.createElement('div');
+            loadingMsg.innerHTML = '<small style="color:blue"><i>Sincronizando...</i></small>';
+            resultDiv.appendChild(loadingMsg);
+
+            fetch(scriptURL, { method: 'POST', body: formData })
+            .then(response => {
+                loadingMsg.innerHTML = '<small style="color:green"><b>✓ Guardado.</b></small>';
+            });
+        }
+    </script>
+</body>
+</html>

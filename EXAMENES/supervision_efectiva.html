@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Supervisión Efectiva</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .question-number {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .user-info {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .certificate {
+            display: none;
+            border: 3px solid #3498db;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            background-color: white;
+        }
+        .certificate h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .certificate-info {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .certificate-footer {
+            text-align: left;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 30px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .download-btn {
+            background-color: #27ae60;
+            margin-top: 15px;
+        }
+        .download-btn:hover {
+            background-color: #219653;
+        }
+        
+        /* Estilos para preguntas bloqueadas */
+        .options label.disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        input:disabled {
+            cursor: not-allowed;
+        }
+        .question.locked {
+            background-color: #f9f9f9;
+            border-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EVALUACIÓN DE: SUPERVISIÓN EFECTIVA</h1>
+        
+        <div id="userInfo" class="user-info" style="display: none;">
+            <p><strong>Usuario:</strong> <span id="userDisplayName"></span></p>
+            <p><strong>MEP:</strong> <span id="userMEP"></span></p>
+            <p><strong>Región:</strong> <span id="userRegion"></span></p>
+        </div>
+        
+        <div id="evaluationSection">
+            <p><strong>Instrucción:</strong> Lee con atención y señala la respuesta correcta.</p>
+            <p><strong>Nota:</strong> Las preguntas aparecerán en orden aleatorio cada vez que realices la evaluación.</p>
+            
+            <form id="evaluationForm">
+                <!-- Las preguntas se insertarán aquí dinámicamente -->
+            </form>
+            
+            <div id="result" class="result" style="display: none;"></div>
+            
+            <div id="certificate" class="certificate">
+                <h2>Comprobante de finalización del curso</h2>
+                <h3>Supervisión Efectiva</h3>
+                
+                <div class="certificate-info">
+                    <p><strong>Nombre del usuario:</strong> <span id="certUserName"></span></p>
+                    <p><strong>MEP:</strong> <span id="certMEP"></span></p>
+                    <p><strong>Fecha de finalización:</strong> <span id="certDate"></span></p>
+                </div>
+                
+                <div class="certificate-footer">
+                    <p>Este comprobante no tiene valor oficial y solo puede ser canjeado en el Área de Capacitación</p>
+                </div>
+                
+                <button class="download-btn" id="downloadBtn">Descargar Comprobante</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de preguntas y respuestas
+        const questionsDatabase = [
+            {
+                id: 1,
+                question: "¿Qué es la supervisión efectiva?",
+                options: [
+                    "a) Ejercer la inspección superior en trabajos realizados por otros.",
+                    "b) Es la actividad que desarrolla una persona al asignar y dirigir a un grupo de subordinados sobre quienes ejerce autoridad para lograr de ellos su máxima eficiencia con satisfacción mutua en beneficio de la empresa.",
+                    "c) Dirigir a un grupo de trabajadores sin tener en cuenta los objetivos y procesos."
+                ],
+                correctAnswer: 'b'
+            },
+            {
+                id: 2,
+                question: "Menciona los objetivos de la supervisión.",
+                options: [
+                    "a) Mejorar la productividad de los empleados.",
+                    "b) Desarrollar un uso óptimo de los recursos.",
+                    "c) Obtener una adecuada rentabilidad de cada actividad realizada.",
+                    "d) Monitorear las actitudes de los subordinados.",
+                    "e) Desarrollar constantemente a los empleados de manera integral.",
+                    "f) Contribuir a mejorar las condiciones laborales.",
+                    "g) Todo lo anterior."
+                ],
+                correctAnswer: 'g'
+            },
+            {
+                id: 3,
+                question: "Menciona las funciones del supervisor.",
+                options: [
+                    "a) Proyectar, dirigir, desarrollar, controlar.",
+                    "b) Regañar, denigrar, deshonesto, falta de liderazgo.",
+                    "c) Aplicar autoridad autocrática todo el tiempo, no generar rotación del personal, no corrige."
+                ],
+                correctAnswer: 'a'
+            },
+            {
+                id: 4,
+                question: "¿Qué es delegar autoridad?",
+                options: [
+                    "a) Quitar autoridad a una persona.",
+                    "b) Dar la autoridad a un subordinado por su capacidad y compartiendo responsabilidad.",
+                    "c) Dar autoridad con toda la responsabilidad."
+                ],
+                correctAnswer: 'b'
+            },
+            {
+                id: 5,
+                question: "Menciona las características de la supervisión.",
+                options: [
+                    "a) Conocimiento del Trabajo.",
+                    "b) Conocimiento de sus Responsabilidades.",
+                    "c) Habilidad Para Instruir.",
+                    "d) Habilidad Para Mejorar Métodos.",
+                    "e) Habilidad para Dirigir.",
+                    "f) Todo lo anterior."
+                ],
+                correctAnswer: 'f'
+            },
+            {
+                id: 6,
+                question: "Menciona las características del supervisor.",
+                options: [
+                    "a) Energía y buena salud.",
+                    "b) Potencial para el liderazgo.",
+                    "c) Capacidad para desarrollar buenas relaciones personales.",
+                    "d) Conocimiento del trabajo y competencia técnica.",
+                    "e) Capacidad para mantener el ritmo de trabajo.",
+                    "f) Capacidad de enseñanza.",
+                    "g) Habilidad para resolver problemas.",
+                    "h) Dedicación y confiabilidad.",
+                    "i) Actitud positiva hacia la administración.",
+                    "j) Todo lo anterior."
+                ],
+                correctAnswer: 'j'
+            },
+            {
+                id: 7,
+                question: "Menciona cuantos tipos de autoridad existen.",
+                options: [
+                    "a) 1",
+                    "b) 2",
+                    "c) 3",
+                    "d) 4"
+                ],
+                correctAnswer: 'c'
+            },
+            {
+                id: 8,
+                question: "¿Qué es la autoridad autocrática?",
+                options: [
+                    "a) Característico del supervisor que permite que los trabajadores participen en el análisis del problema y su solución. Anima a sus hombres para que participen en la decisión.",
+                    "b) Característico de individuo, que, sin consultar con nadie, señalan o determinan que debe hacerse, cómo y cuándo en forma categórica, indican la fecha de su cumplimiento y luego lo comprueban en la fecha y hora señaladas.",
+                    "c) El supervisor no ejerce control del problema, prefieren que sus hombres hagan lo que consideran conveniente y deja que las cosas sigan su propio camino."
+                ],
+                correctAnswer: 'b'
+            },
+            {
+                id: 9,
+                question: "¿Qué es la autoridad democrática?",
+                options: [
+                    "a) El supervisor no ejerce control del problema, prefieren que sus hombres hagan lo que consideran conveniente y deja que las cosas sigan su propio camino.",
+                    "b) Característico de individuo, que, sin consultar con nadie, señalan o determinan que debe hacerse, cómo y cuándo en forma categórica, indican la fecha de su cumplimiento y luego lo comprueban en la fecha y hora señaladas.",
+                    "c) Característico del supervisor que permite que los trabajadores participen en el análisis del problema y su solución. Anima a sus hombres para que participen en la decisión."
+                ],
+                correctAnswer: 'c'
+            },
+            {
+                id: 10,
+                question: "¿Qué es la autoridad liberal o conformista?",
+                options: [
+                    "a) Característico de individuo, que, sin consultar con nadie, señalan o determinan que debe hacerse, cómo y cuándo en forma categórica, indican la fecha de su cumplimiento y luego lo comprueban en la fecha y hora señaladas.",
+                    "b) El supervisor no ejerce control del problema, prefieren que sus hombres hagan lo que consideran conveniente y deja que las cosas sigan su propio camino.",
+                    "c) Característico del supervisor que permite que los trabajadores participen en el análisis del problema y su solución. Anima a sus hombres para que participen en la decisión."
+                ],
+                correctAnswer: 'b'
+            },
+            {
+                id: 11,
+                question: "Menciona cuales son las necesidades psicológicas de los subordinados.",
+                options: [
+                    "a) Seguridad.",
+                    "b) Reconocimiento.",
+                    "c) Pertenencia.",
+                    "d) Respeto y dignidad.",
+                    "e) Oportunidad.",
+                    "f) Realización",
+                    "g) Propósito.",
+                    "h) Competencia.",
+                    "i) Todo lo anterior."
+                ],
+                correctAnswer: 'i'
+            },
+            {
+                id: 12,
+                question: "¿Cuáles son las características de un buen líder?",
+                options: [
+                    "a) Sabe trabajar en equipo.",
+                    "b) No le asustan los riesgos.",
+                    "c) Son leales y sinceros.",
+                    "d) Tienen pasión por nuevos retos.",
+                    "e) Sabe cuál es su debilidad.",
+                    "f) Sabe cuál es su fuerza.",
+                    "g) Sabe lo que quiere.",
+                    "h) Todo lo anterior."
+                ],
+                correctAnswer: 'h'
+            },
+            {
+                id: 13,
+                question: "¿Qué es la comunicación?",
+                options: [
+                    "a) Es el intercambio de información que se produce entre dos o más individuos con el objetivo de aportar información y recibirla.",
+                    "b) Es la entrega de información en la que solo se limita a emitirla.",
+                    "c) Es la recepción de información sin dar a conocer su opinión."
+                ],
+                correctAnswer: 'a'
+            },
+            {
+                id: 14,
+                question: "¿Características de un instructor?",
+                options: [
+                    "a) Conocimiento.",
+                    "b) Entusiasmo.",
+                    "c) Sentido del humor.",
+                    "d) Interés.",
+                    "e) Adaptabilidad.",
+                    "f) Sinceridad.",
+                    "g) Excelente.",
+                    "h) Asistencia individual.",
+                    "i) Todo lo anterior."
+                ],
+                correctAnswer: 'i'
+            },
+            {
+                id: 15,
+                question: "Menciona cuales son las actividades que se deben ver reflejadas en la honestidad.",
+                options: [
+                    "a) No hacer mal uso de la información de la empresa.",
+                    "b) No utilizar los recursos de la empresa para un beneficio personal.",
+                    "c) Aceptar los errores cometidos.",
+                    "d) Todo lo anterior.",
+                    "e) Ocultar los problemas de mantenimiento."
+                ],
+                correctAnswer: 'd'
+            }
+        ];
+
+        // Variable para almacenar las preguntas aleatorias y sus respuestas correctas
+        let randomizedQuestions = [];
+        let currentCorrectAnswers = {};
+
+        // Verificar si hay una sesión activa al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUserData = localStorage.getItem('userData');
+            
+            if (savedUserData) {
+                const userData = JSON.parse(savedUserData);
+                showUserInfo(userData);
+                // Generar preguntas aleatorias después de mostrar la info del usuario
+                generateRandomQuestions();
+            } else {
+                alert('No hay una sesión activa. Serás redirigido al sistema de inicio de sesión.');
+                window.location.href = 'index.html';
+            }
+        });
+        
+        // Mostrar información del usuario
+        function showUserInfo(userData) {
+            const userDisplayName = `${userData.firstName} ${userData.lastName}`;
+            
+            document.getElementById('userDisplayName').textContent = userDisplayName;
+            document.getElementById('userMEP').textContent = userData.mep;
+            document.getElementById('userRegion').textContent = userData.region;
+            document.getElementById('userInfo').style.display = 'block';
+            
+            // También establecer los datos para el certificado
+            document.getElementById('certUserName').textContent = userDisplayName;
+            document.getElementById('certMEP').textContent = userData.mep;
+        }
+
+        // Función para generar preguntas aleatorias
+        function generateRandomQuestions() {
+            // Crear una copia del array de preguntas
+            const questionsCopy = [...questionsDatabase];
+            
+            // Mezclar las preguntas aleatoriamente
+            for (let i = questionsCopy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questionsCopy[i], questionsCopy[j]] = [questionsCopy[j], questionsCopy[i]];
+            }
+            
+            // Tomar solo las primeras 15 preguntas (o todas si hay menos)
+            randomizedQuestions = questionsCopy.slice(0, 15);
+            
+            // Reconstruir el objeto de respuestas correctas con las nuevas preguntas
+            currentCorrectAnswers = {};
+            randomizedQuestions.forEach((question, index) => {
+                currentCorrectAnswers[`q${index + 1}`] = question.correctAnswer;
+            });
+            
+            // Renderizar las preguntas en el formulario
+            renderQuestions();
+        }
+
+        // Función para renderizar las preguntas en el formulario
+        function renderQuestions() {
+            const form = document.getElementById('evaluationForm');
+            
+            // Limpiar el formulario (excepto el botón de calificar)
+            const gradeBtn = document.getElementById('gradeBtn');
+            form.innerHTML = '';
+            
+            // Agregar cada pregunta al formulario
+            randomizedQuestions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.textContent = `${index + 1}. ${question.question}`;
+                
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+                
+                question.options.forEach((option, optionIndex) => {
+                    const letter = String.fromCharCode(97 + optionIndex); // a, b, c, etc.
+                    
+                    const label = document.createElement('label');
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `q${index + 1}`;
+                    input.value = letter;
+                    
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(` ${option}`));
+                    optionsDiv.appendChild(label);
+                });
+                
+                questionDiv.appendChild(questionNumber);
+                questionDiv.appendChild(optionsDiv);
+                form.appendChild(questionDiv);
+            });
+            
+            // Agregar el botón de calificar al final
+            const newGradeBtn = document.createElement('button');
+            newGradeBtn.type = 'button';
+            newGradeBtn.id = 'gradeBtn';
+            newGradeBtn.textContent = 'Calificar Evaluación';
+            newGradeBtn.disabled = true;
+            form.appendChild(newGradeBtn);
+            
+            // Re-asignar el event listener al nuevo botón
+            newGradeBtn.addEventListener('click', gradeEvaluation);
+            
+            // Re-asignar event listeners a los radio buttons
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const allAnswered = checkAllQuestionsAnswered();
+                    document.getElementById('gradeBtn').disabled = !allAnswered;
+                });
+            });
+        }
+        
+        // Verificar si todas las preguntas han sido respondidas
+        function checkAllQuestionsAnswered() {
+            for (let i = 1; i <= 15; i++) {
+                const questionName = 'q' + i;
+                const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+                if (!selectedOption) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        // Función para bloquear todas las preguntas después de calificar
+        function lockQuestionsAfterGrading() {
+            // Seleccionar todos los inputs de preguntas (radio buttons)
+            const allInputs = document.querySelectorAll('input[type="radio"]');
+            
+            // Deshabilitar todos los inputs
+            allInputs.forEach(input => {
+                input.disabled = true;
+            });
+            
+            // Cambiar el estilo visual para indicar que están bloqueados
+            const allLabels = document.querySelectorAll('.options label');
+            allLabels.forEach(label => {
+                label.style.opacity = '0.7';
+                label.style.cursor = 'not-allowed';
+            });
+            
+            // Cambiar estilo de las preguntas
+            const allQuestions = document.querySelectorAll('.question');
+            allQuestions.forEach(question => {
+                question.classList.add('locked');
+            });
+            
+            // Deshabilitar el botón de calificar también
+            const gradeBtn = document.getElementById('gradeBtn');
+            if (gradeBtn) {
+                gradeBtn.disabled = true;
+                gradeBtn.textContent = 'Evaluación Completada';
+                gradeBtn.style.backgroundColor = '#95a5a6';
+            }
+        }
+        
+        // Calificar evaluación
+        function gradeEvaluation() {
+            let score = 0;
+            
+            for (let i = 1; i <= 15; i++) {
+                const questionName = 'q' + i;
+                const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+                
+                if (selectedOption && selectedOption.value === currentCorrectAnswers[questionName]) {
+                    score++;
+                }
+            }
+            
+            const percentage = (score / 15) * 100;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = `Obtuviste ${score} de 15 respuestas correctas (${percentage.toFixed(2)}%)`;
+            
+            // BLOQUEAR PREGUNTAS DESPUÉS DE CALIFICAR
+            lockQuestionsAfterGrading();
+            enviarDatosAGoogle(score, percentage);
+            
+            if (percentage >= 80) {
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML += '<br>¡Felicidades! Has aprobado la evaluación.';
+                
+                // Mostrar certificado
+                document.getElementById('certDate').textContent = new Date().toLocaleDateString();
+                document.getElementById('certificate').style.display = 'block';
+                
+                // Guardar el resultado en localStorage
+                saveEvaluationResult(score, percentage);
+            } else {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML += '<br>No has alcanzado el 80% necesario para aprobar. Inténtalo de nuevo.';
+                document.getElementById('certificate').style.display = 'none';
+                
+                // Borrar el progreso del PDF para que tenga que leer de nuevo
+                deletePDFProgress();
+                
+                // Redirigir después de 3 segundos
+                setTimeout(function() {
+                    alert('Tu progreso del PDF ha sido reiniciado. Debes revisar el material nuevamente antes de intentar el examen otra vez.');
+                    window.location.href = '../index.html';
+                }, 3000);
+            }
+        }
+        
+        // Guardar resultado de la evaluación
+        function saveEvaluationResult(score, percentage) {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            
+            if (!userData.evaluations) {
+                userData.evaluations = {};
+            }
+            
+            userData.evaluations['supervision_efectiva'] = {
+                score: score,
+                percentage: percentage,
+                date: new Date().toISOString(),
+                passed: percentage >= 80
+            };
+            
+            localStorage.setItem('userData', JSON.stringify(userData));
+        }
+        
+        // Función para eliminar el progreso del PDF
+        function deletePDFProgress() {
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    // Crear el ID único igual que en el visor de PDF
+                    const userId = `${user.firstName}_${user.lastName}_${user.mep}`.replace(/\s+/g, '_').toUpperCase();
+                    
+                    // Eliminar específicamente el progreso del PDF de Supervisión Efectiva
+                    localStorage.removeItem(`pdfProgress_${userId}_supervision_efectiva`);
+                    
+                    console.log('Progreso del PDF eliminado para forzar nueva lectura');
+                } catch (e) {
+                    console.error('Error al eliminar progreso del PDF:', e);
+                }
+            }
+        }
+        
+        // ==========================
+        // DESCARGA DE COMPROBANTE
+        // ==========================
+        document.getElementById('downloadBtn').addEventListener('click', function(){
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if(!userData) {
+                alert('Error: No se encontró información del usuario.');
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 1000;
+            canvas.height = 700;
+            const ctx = canvas.getContext('2d');
+
+            // Fondo con gradiente
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, "#f0f8ff");
+            gradient.addColorStop(1, "#ffffff");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Borde azul
+            ctx.strokeStyle = "#3498db";
+            ctx.lineWidth = 8;
+            ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+
+            // Título con texto más remarcado
+            ctx.fillStyle = "#2c3e50";
+            ctx.font = "bold 38px Georgia";
+            ctx.textAlign = "center";
+            ctx.fillText("Comprobante de Finalización del Curso:", canvas.width/2, 120);
+            ctx.fillText("Supervisión Efectiva", canvas.width/2, 170);
+
+            // Texto descriptivo con texto más remarcado
+            ctx.font = "bold 30px Arial";
+            ctx.fillStyle = "#000";
+            ctx.fillText("Se otorga el presente comprobante a:", canvas.width/2, 240); 
+
+            // Nombre del usuario con texto más remarcado
+            ctx.font = "bold 36px 'Times New Roman'";
+            ctx.fillStyle = "#3498db";
+            const userName = `${userData.firstName} ${userData.lastName}`;
+            ctx.fillText(userName.toUpperCase(), canvas.width/2, 320); 
+
+            // Información adicional con texto más remarcado
+            ctx.font = "bold 26px Arial";
+            ctx.fillStyle = "#333";
+            ctx.fillText(`MEP: ${userData.mep}`, canvas.width/2, 400); 
+            ctx.fillText(`Finalizado el: ${new Date().toLocaleDateString()}`, canvas.width/2, 470); 
+
+            // Cargar y dibujar el logo en el centro
+            const logo = new Image();
+            logo.onload = function() {
+                // Dibujar el logo con opacidad reducida y tamaño aumentado
+                ctx.globalAlpha = 0.3;
+                const logoSize = 500;
+                const logoX = (canvas.width - logoSize) / 2;
+                const logoY = (canvas.height - logoSize) / 2;
+                ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+                ctx.globalAlpha = 1.0;
+
+                // Leyenda inferior con texto más remarcado
+                ctx.font = "bold italic 18px Arial";
+                ctx.fillStyle = "#666";
+                ctx.textAlign = "left";
+                ctx.fillText("El comprobante no tiene validez legal y para la elaboración y", 60, 600);
+                ctx.fillText("entrega de DC-3, favor de presentar este documento en el área de capacitación.", 60, 620);
+                
+                // Crear y descargar la imagen
+                const link = document.createElement('a');
+                link.download = `Comprobante_${userName.toUpperCase()}_Supervision_Efectiva.jpg`;
+                link.href = canvas.toDataURL('image/jpeg');
+                link.click();
+                
+                // Borrar el progreso del PDF después de descargar el comprobante
+                deletePDFProgress();
+                
+                // Redirigir automáticamente después de descargar el comprobante
+                setTimeout(function() {
+                    window.location.href = '../index.html';
+                }, 1000);
+            };
+            
+            // Si hay un error al cargar el logo, continuar sin él
+            logo.onerror = function() {
+                console.log("Error al cargar el logo, generando comprobante sin logo");
+                
+                // Leyenda inferior con texto más remarcado
+                ctx.font = "bold italic 18px Arial";
+                ctx.fillStyle = "#666";
+                ctx.textAlign = "left";
+                ctx.fillText("El comprobante no tiene validez legal y para la elaboración y", 60, 600);
+                ctx.fillText("entrega de DC-3, favor de presentar este documento en el área de capacitación.", 60, 620);
+
+                // Crear y descargar la imagen
+                const link = document.createElement('a');
+                link.download = `Comprobante_${userName.toUpperCase()}_Supervision_Efectiva.jpg`;
+                link.href = canvas.toDataURL('image/jpeg');
+                link.click();
+                
+                // Borrar el progreso del PDF después de descargar el comprobante
+                deletePDFProgress();
+                
+                // Redirigir automáticamente después de descargar el comprobante
+                setTimeout(function() {
+                    window.location.href = '../index.html';
+                }, 1000);
+            };
+            
+            // Cargar el logo
+            logo.src = 'logo.svg';
+        });
+    </script>
+    <script>
+        // 1. FUNCIÓN PARA ENVIAR DATOS
+function enviarDatosAGoogle(score, percentage) {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    
+    if (!userData) {
+        console.error("Error: No hay datos de usuario (localStorage vacío).");
+        return;
+    }
+
+    // -- URL DE APPS SCRIPT ---
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxEZXDOdoXQMyDw7TAN3OO-kwkyODxqABPbyyEoIUzQb_E1VYo8dHE-L6CVScmgv2sP2g/exec';
+    // --------------------------------------------------------
+
+    const formData = new FormData();
+    formData.append('nombre', `${userData.firstName} ${userData.lastName}`);
+    formData.append('mep', userData.mep);
+    
+    // AQUÍ SE ENVÍA LA REGIÓN. El Google Script usará esto para elegir la hoja.
+    formData.append('region', userData.region); 
+    
+    formData.append('score', score);
+    formData.append('percentage', percentage.toFixed(2));
+
+    // Feedback visual para el usuario
+    const resultDiv = document.getElementById('result');
+    const loadingMsg = document.createElement('div');
+    loadingMsg.innerHTML = '<small style="color:blue"><i>Sincronizando resultados con base de datos...</i></small>';
+    resultDiv.appendChild(loadingMsg);
+
+    fetch(scriptURL, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        loadingMsg.innerHTML = '<small style="color:green"><b>✓ Resultados guardados correctamente.</b></small>';
+        console.log('Datos guardados en la hoja:', userData.region);
+    });
+}
+    </script>
+</body>
+</html>

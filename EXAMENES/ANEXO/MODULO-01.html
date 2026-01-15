@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Seguridad, Salud en el Trabajo y Protección Ambiental</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .question-number {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .user-info {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .certificate {
+            display: none;
+            border: 3px solid #3498db;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            background-color: white;
+        }
+        .certificate h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .certificate-info {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .certificate-footer {
+            text-align: left;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 30px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .download-btn {
+            background-color: #27ae60;
+            margin-top: 15px;
+        }
+        .download-btn:hover {
+            background-color: #219653;
+        }
+        
+        /* Estilos para preguntas bloqueadas */
+        .options label.disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        input:disabled {
+            cursor: not-allowed;
+        }
+        .question.locked {
+            background-color: #f9f9f9;
+            border-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EVALUACIÓN DE: SEGURIDAD, SALUD EN EL TRABAJO Y PROTECCIÓN AMBIENTAL</h1>
+        
+        <div id="userInfo" class="user-info" style="display: none;">
+            <p><strong>Usuario:</strong> <span id="userDisplayName"></span></p>
+            <p><strong>MEP:</strong> <span id="userMEP"></span></p>
+            <p><strong>Región:</strong> <span id="userRegion"></span></p>
+        </div>
+        
+        <div id="evaluationSection">
+            <p><strong>Instrucción:</strong> Lee con atención y señala la respuesta correcta.</p>
+            <p><strong>Nota:</strong> Las preguntas aparecerán en orden aleatorio cada vez que realices la evaluación.</p>
+            
+            <form id="evaluationForm">
+                <!-- Las preguntas se insertarán aquí dinámicamente -->
+            </form>
+            
+            <div id="result" class="result" style="display: none;"></div>
+            
+            <div id="certificate" class="certificate">
+                <h2>Comprobante de finalización del curso</h2>
+                <h3>Seguridad, Salud en el Trabajo<br>y Protección Ambiental</h3>
+                
+                <div class="certificate-info">
+                    <p><strong>Nombre del usuario:</strong> <span id="certUserName"></span></p>
+                    <p><strong>MEP:</strong> <span id="certMEP"></span></p>
+                    <p><strong>Fecha de finalización:</strong> <span id="certDate"></span></p>
+                </div>
+                
+                <div class="certificate-footer">
+                    <p>Este comprobante no tiene valor oficial y solo puede ser canjeado en el Área de Capacitación</p>
+                </div>
+                
+                <button class="download-btn" id="downloadBtn">Descargar Comprobante</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de preguntas y respuestas actualizada
+        const questionsDatabase = [
+            {
+                id: 1,
+                question: "Los conceptos básicos de Seguridad y Salud en el trabajo son:",
+                options: [
+                    "a) Condiciones inseguras, Condiciones peligrosas, Riesgo, Peligro.",
+                    "b) Enfermedad de trabajo, Incidentes, Personal ocupacionalmente expuesto.",
+                    "c) Programa de Seguridad y Salud en el Trabajo, Riesgos de Trabajo.",
+                    "d) Diagnóstico de seguridad y salud en el trabajo, responsable de SSPA.",
+                    "e) Todas las anteriores."
+                ],
+                correctAnswer: 'e'
+            },
+            {
+                id: 2,
+                question: "Evento indeseado no planeado que puede haber causado daños, pérdidas, lesiones al personal, propiedad o medio ambiente:",
+                options: [
+                    "a) Accidente.",
+                    "b) Incidente.",
+                    "c) Tragedia.",
+                    "d) Ninguna."
+                ],
+                correctAnswer: 'b'
+            },
+            {
+                id: 3,
+                question: "Evento inesperado no planeado que ocasiona una lesión, pérdida, daños al personal, propiedad, medio ambiente o el proceso:",
+                options: [
+                    "a) Tragedia.",
+                    "b) Accidente.",
+                    "c) Incidente.",
+                    "d) Ninguna de las anteriores."
+                ],
+                correctAnswer: 'b'
+            },
+            {
+                id: 4,
+                question: "Selecciona e identifica las recomendaciones para el correcto manejo de las sustancias químicas peligrosas:",
+                options: [
+                    "a) Utilizar los elementos de protección personal.",
+                    "b) No se debe pipetear sustancias químicas con la boca.",
+                    "c) No se debe olfatear directamente el contenido de un frasco.",
+                    "d) Identificar de manera correcta las sustancias químicas peligrosas del área de trabajo.",
+                    "e) Todas las anteriores."
+                ],
+                correctAnswer: 'e'
+            },
+            {
+                id: 5,
+                question: "La señalización de seguridad en las instalaciones de trabajo son para:",
+                options: [
+                    "a) Advertir oportunamente al trabajador sobre riesgos, peligros, ubicación de equipos de contra incendios, etc.",
+                    "b) Para que las paredes de las instalaciones se vean mejor.",
+                    "c) Para relajamiento visual de todos los trabajadores.",
+                    "d) Todas las anteriores.",
+                    "e) Ninguna de las anteriores."
+                ],
+                correctAnswer: 'a'
+            },
+            {
+                id: 6,
+                question: "Selecciona correctamente los tipos de señalización que existen en el centro de trabajo:",
+                options: [
+                    "a) Señales de Prohibición.",
+                    "b) Señales de Obligación.",
+                    "c) Señales de Precaución.",
+                    "d) Señales de Información.",
+                    "e) Todas las anteriores."
+                ],
+                correctAnswer: 'e'
+            },
+            {
+                id: 7,
+                question: "Identifica algunas de las condiciones de prevención y protección contra incendios:",
+                options: [
+                    "a) Contar con salidas normales y/o de emergencia.",
+                    "b) Contar con un comedor digno.",
+                    "c) Contar con baños limpios y adecuados para damas y caballeros.",
+                    "d) Contar con un Plan de Respuesta a Emergencias."
+                ],
+                correctAnswer: 'ad' // Dos respuestas correctas: a y d
+            },
+            {
+                id: 8,
+                question: "Selecciona el objetivo de la seguridad y la higiene industrial:",
+                options: [
+                    "a) Que todas las Instalaciones laborales se encuentren limpias e higiénicas.",
+                    "b) Evitar la exposición de los trabajadores a ambientes con agentes contaminantes.",
+                    "c) Todas las anteriores."
+                ],
+                correctAnswer: 'c'
+            },
+            {
+                id: 9,
+                question: "¿Qué son los agentes químicos?",
+                options: [
+                    "a) Son aquellos que se encuentran en el medio ambiente y nos pueden ocasionar algún daño.",
+                    "b) Son aquellas sustancias o mezclas capaces de modificar las condiciones ambientales del centro de trabajo y que pueden alterar la salud de los trabajadores.",
+                    "c) Son todos aquellos que causan condiciones adversas en las áreas de trabajo.",
+                    "d) Todas las anteriores."
+                ],
+                correctAnswer: 'b'
+            },
+            {
+                id: 10,
+                question: "¿Cuáles son los agentes físicos contaminantes del ambiente laboral?",
+                options: [
+                    "a) Ruido, Iluminación, Vibración, Radiaciones ionizantes.",
+                    "b) Condiciones térmicas elevadas.",
+                    "c) Radiaciones no ionizantes.",
+                    "d) Todas las anteriores."
+                ],
+                correctAnswer: 'd'
+            },
+            {
+                id: 11,
+                question: "¿Qué es protección ambiental?",
+                options: [
+                    "a) Cuidar de no contaminar, quemar la basura adecuadamente, tirar los residuos muy lejos.",
+                    "b) Es el conjunto de políticas y medidas que se toman a nivel público y privado para mejorar el ambiente y controlar su deterioro.",
+                    "c) Transportar material peligroso con sus debidos permisos en regla.",
+                    "d) Todas las anteriores."
+                ],
+                correctAnswer: 'b'
+            },
+            {
+                id: 12,
+                question: "¿En qué se basa el desarrollo sostenible?",
+                options: [
+                    "a) Se basa en solucionar todos los problemas existentes en el medio ambiente.",
+                    "b) Se basa en satisfacer las necesidades de las generaciones presentes sin comprometer las posibilidades de las generaciones futuras para atender sus propias necesidades.",
+                    "c) Se basa en el sustento alimenticio para toda la fauna silvestre de las áreas protegidas.",
+                    "d) Todas las anteriores."
+                ],
+                correctAnswer: 'b'
+            },
+            {
+                id: 13,
+                question: "¿Cómo se clasifican los recursos naturales?",
+                options: [
+                    "a) Recursos hidrológicos, Recursos climáticos.",
+                    "b) Recursos de fauna, recursos de vegetación.",
+                    "c) Recursos minerales y petroleros, Recursos de suelos.",
+                    "d) Recursos Renovables, No renovables e Inagotables.",
+                    "e) Todas las anteriores."
+                ],
+                correctAnswer: 'd'
+            },
+            {
+                id: 14,
+                question: "¿Qué es la prevención de la contaminación?",
+                options: [
+                    "a) Una actividad estática.",
+                    "b) Algunas medidas identificadas como benéficas para el medio ambiente.",
+                    "c) El conjunto de disposiciones y medidas anticipadas para evitar el deterioro del medio ambiente.",
+                    "d) Todas las anteriores."
+                ],
+                correctAnswer: 'c'
+            },
+            {
+                id: 15,
+                question: "Identifica las consecuencias de la contaminación:",
+                options: [
+                    "a) Suelos erosionados e infértiles.",
+                    "b) Aguas subterráneas y superficiales contaminadas.",
+                    "c) Ciudades con alerta de contaminación atmosférica.",
+                    "d) Todas las anteriores."
+                ],
+                correctAnswer: 'd'
+            }
+        ];
+
+        // Variable para almacenar las preguntas aleatorias y sus respuestas correctas
+        let randomizedQuestions = [];
+        let currentCorrectAnswers = {};
+
+        // Verificar si hay una sesión activa al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUserData = localStorage.getItem('userData');
+            
+            if (savedUserData) {
+                const userData = JSON.parse(savedUserData);
+                showUserInfo(userData);
+                // Generar preguntas aleatorias después de mostrar la info del usuario
+                generateRandomQuestions();
+            } else {
+                alert('No hay una sesión activa. Serás redirigido al sistema de inicio de sesión.');
+                window.location.href = 'index.html';
+            }
+        });
+        
+        // Mostrar información del usuario
+        function showUserInfo(userData) {
+            const userDisplayName = `${userData.firstName} ${userData.lastName}`;
+            
+            document.getElementById('userDisplayName').textContent = userDisplayName;
+            document.getElementById('userMEP').textContent = userData.mep;
+            document.getElementById('userRegion').textContent = userData.region;
+            document.getElementById('userInfo').style.display = 'block';
+            
+            // También establecer los datos para el certificado
+            document.getElementById('certUserName').textContent = userDisplayName;
+            document.getElementById('certMEP').textContent = userData.mep;
+        }
+
+        // Función para generar preguntas aleatorias
+        function generateRandomQuestions() {
+            // Crear una copia del array de preguntas
+            const questionsCopy = [...questionsDatabase];
+            
+            // Mezclar las preguntas aleatoriamente
+            for (let i = questionsCopy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questionsCopy[i], questionsCopy[j]] = [questionsCopy[j], questionsCopy[i]];
+            }
+            
+            // Tomar solo las primeras 15 preguntas (o todas si hay menos)
+            randomizedQuestions = questionsCopy.slice(0, 15);
+            
+            // Reconstruir el objeto de respuestas correctas con las nuevas preguntas
+            currentCorrectAnswers = {};
+            randomizedQuestions.forEach((question, index) => {
+                currentCorrectAnswers[`q${index + 1}`] = question.correctAnswer;
+            });
+            
+            // Renderizar las preguntas en el formulario
+            renderQuestions();
+        }
+
+        // Función para renderizar las preguntas en el formulario
+        function renderQuestions() {
+            const form = document.getElementById('evaluationForm');
+            
+            // Limpiar el formulario (excepto el botón de calificar)
+            const gradeBtn = document.getElementById('gradeBtn');
+            form.innerHTML = '';
+            
+            // Agregar cada pregunta al formulario
+            randomizedQuestions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.textContent = `${index + 1}. ${question.question}`;
+                
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+                
+                question.options.forEach((option, optionIndex) => {
+                    const letter = String.fromCharCode(97 + optionIndex); // a, b, c, etc.
+                    
+                    const label = document.createElement('label');
+                    const input = document.createElement('input');
+                    
+                    // Para preguntas con múltiples respuestas correctas, usar checkbox
+                    if (question.correctAnswer.length > 1) {
+                        input.type = 'checkbox';
+                        input.name = `q${index + 1}_${letter}`;
+                    } else {
+                        input.type = 'radio';
+                        input.name = `q${index + 1}`;
+                    }
+                    
+                    input.value = letter;
+                    
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(` ${option}`));
+                    optionsDiv.appendChild(label);
+                });
+                
+                questionDiv.appendChild(questionNumber);
+                questionDiv.appendChild(optionsDiv);
+                form.appendChild(questionDiv);
+            });
+            
+            // Agregar el botón de calificar al final
+            const newGradeBtn = document.createElement('button');
+            newGradeBtn.type = 'button';
+            newGradeBtn.id = 'gradeBtn';
+            newGradeBtn.textContent = 'Calificar Evaluación';
+            newGradeBtn.disabled = true;
+            form.appendChild(newGradeBtn);
+            
+            // Re-asignar el event listener al nuevo botón
+            newGradeBtn.addEventListener('click', gradeEvaluation);
+            
+            // Re-asignar event listeners a los inputs
+            document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
+                input.addEventListener('change', function() {
+                    const allAnswered = checkAllQuestionsAnswered();
+                    document.getElementById('gradeBtn').disabled = !allAnswered;
+                });
+            });
+        }
+        
+        // Verificar si todas las preguntas han sido respondidas
+        function checkAllQuestionsAnswered() {
+            for (let i = 1; i <= 15; i++) {
+                const questionName = 'q' + i;
+                const question = randomizedQuestions.find(q => `q${randomizedQuestions.indexOf(q) + 1}` === questionName);
+                
+                // Para preguntas con múltiples respuestas correctas, verificar que al menos una opción esté seleccionada
+                if (question && question.correctAnswer.length > 1) {
+                    const selectedOptions = document.querySelectorAll(`input[name^="${questionName}_"]:checked`);
+                    if (selectedOptions.length === 0) {
+                        return false;
+                    }
+                } else {
+                    // Para preguntas de una sola respuesta
+                    const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+                    if (!selectedOption) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        
+        // Función para bloquear todas las preguntas después de calificar
+        function lockQuestionsAfterGrading() {
+            // Seleccionar todos los inputs de preguntas (radio buttons y checkboxes)
+            const allInputs = document.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+            
+            // Deshabilitar todos los inputs
+            allInputs.forEach(input => {
+                input.disabled = true;
+            });
+            
+            // Cambiar el estilo visual para indicar que están bloqueados
+            const allLabels = document.querySelectorAll('.options label');
+            allLabels.forEach(label => {
+                label.style.opacity = '0.7';
+                label.style.cursor = 'not-allowed';
+            });
+            
+            // Cambiar estilo de las preguntas
+            const allQuestions = document.querySelectorAll('.question');
+            allQuestions.forEach(question => {
+                question.classList.add('locked');
+            });
+            
+            // Deshabilitar el botón de calificar también
+            const gradeBtn = document.getElementById('gradeBtn');
+            if (gradeBtn) {
+                gradeBtn.disabled = true;
+                gradeBtn.textContent = 'Evaluación Completada';
+                gradeBtn.style.backgroundColor = '#95a5a6';
+            }
+        }
+        
+        // Calificar evaluación
+        function gradeEvaluation() {
+            let score = 0;
+            
+            for (let i = 1; i <= 15; i++) {
+                const questionName = 'q' + i;
+                const correctAnswer = currentCorrectAnswers[questionName];
+                
+                // Para preguntas con múltiples respuestas correctas
+                if (correctAnswer.length > 1) {
+                    let userAnswer = '';
+                    const selectedOptions = document.querySelectorAll(`input[name^="${questionName}_"]:checked`);
+                    
+                    selectedOptions.forEach(option => {
+                        userAnswer += option.value;
+                    });
+                    
+                    // Ordenar ambas respuestas para comparar
+                    const sortedUserAnswer = userAnswer.split('').sort().join('');
+                    const sortedCorrectAnswer = correctAnswer.split('').sort().join('');
+                    
+                    if (sortedUserAnswer === sortedCorrectAnswer) {
+                        score++;
+                    }
+                } else {
+                    // Para preguntas de una sola respuesta
+                    const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+                    
+                    if (selectedOption && selectedOption.value === correctAnswer) {
+                        score++;
+                    }
+                }
+            }
+            
+            const percentage = (score / 15) * 100;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = `Obtuviste ${score} de 15 respuestas correctas (${percentage.toFixed(2)}%)`;
+            
+            // BLOQUEAR PREGUNTAS DESPUÉS DE CALIFICAR
+            lockQuestionsAfterGrading();
+            enviarCalificacionGoogle(score, percentage);
+            
+            if (percentage >= 80) {
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML += '<br>¡Felicidades! Has aprobado la evaluación.';
+                
+                // Mostrar certificado
+                document.getElementById('certDate').textContent = new Date().toLocaleDateString();
+                document.getElementById('certificate').style.display = 'block';
+                
+                // Guardar el resultado en localStorage
+                saveEvaluationResult(score, percentage);
+            } else {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML += '<br>No has alcanzado el 80% necesario para aprobar. Inténtalo de nuevo.';
+                document.getElementById('certificate').style.display = 'none';
+                
+                // Borrar el progreso del PDF para que tenga que leer de nuevo
+                deletePDFProgress();
+                
+                // Redirigir después de 3 segundos
+                setTimeout(function() {
+                    alert('Tu progreso del PDF ha sido reiniciado. Debes revisar el material nuevamente antes de intentar el examen otra vez.');
+                    window.location.href = '../../index.html';
+                }, 3000);
+            }
+        }
+        
+        // Guardar resultado de la evaluación
+        function saveEvaluationResult(score, percentage) {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            
+            if (!userData.evaluations) {
+                userData.evaluations = {};
+            }
+            
+            userData.evaluations['seguridad_salud_proteccion_ambiental'] = {
+                score: score,
+                percentage: percentage,
+                date: new Date().toISOString(),
+                passed: percentage >= 80
+            };
+            
+            localStorage.setItem('userData', JSON.stringify(userData));
+        }
+        
+        // Función para eliminar el progreso del PDF
+        function deletePDFProgress() {
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    // Crear el ID único igual que en el visor de PDF
+                    const userId = `${user.firstName}_${user.lastName}_${user.mep}`.replace(/\s+/g, '_').toUpperCase();
+                    
+                    // Eliminar específicamente el progreso del PDF de Seguridad, Salud en el Trabajo y Protección Ambiental
+                    localStorage.removeItem(`pdfProgress_${userId}_MODULO_01`);
+                    
+                    console.log('Progreso del PDF eliminado para forzar nueva lectura');
+                } catch (e) {
+                    console.error('Error al eliminar progreso del PDF:', e);
+                }
+            }
+        }
+        
+        // ==========================
+        // DESCARGA DE COMPROBANTE
+        // ==========================
+        document.getElementById('downloadBtn').addEventListener('click', function(){
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if(!userData) {
+                alert('Error: No se encontró información del usuario.');
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 1000;
+            canvas.height = 700;
+            const ctx = canvas.getContext('2d');
+
+            // Fondo con gradiente
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, "#f0f8ff");
+            gradient.addColorStop(1, "#ffffff");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Borde azul
+            ctx.strokeStyle = "#3498db";
+            ctx.lineWidth = 8;
+            ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+
+            // Título con texto más remarcado
+            ctx.fillStyle = "#2c3e50";
+            ctx.font = "bold 38px Georgia";
+            ctx.textAlign = "center";
+            ctx.fillText("Comprobante de Finalización del Curso:", canvas.width/2, 120);
+            
+            // Dividir el título del curso en dos líneas para mejor presentación
+            ctx.font = "bold 34px Georgia";
+            ctx.fillText("Seguridad, Salud en el Trabajo", canvas.width/2, 170);
+            ctx.fillText("y Protección Ambiental", canvas.width/2, 210);
+
+            // Texto descriptivo con texto más remarcado
+            ctx.font = "bold 30px Arial";
+            ctx.fillStyle = "#000";
+            ctx.fillText("Se otorga el presente comprobante a:", canvas.width/2, 270); 
+
+            // Nombre del usuario con texto más remarcado
+            ctx.font = "bold 36px 'Times New Roman'";
+            ctx.fillStyle = "#3498db";
+            const userName = `${userData.firstName} ${userData.lastName}`;
+            ctx.fillText(userName.toUpperCase(), canvas.width/2, 340); 
+
+            // Información adicional con texto más remarcado
+            ctx.font = "bold 26px Arial";
+            ctx.fillStyle = "#333";
+            ctx.fillText(`MEP: ${userData.mep}`, canvas.width/2, 420); 
+            ctx.fillText(`Finalizado el: ${new Date().toLocaleDateString()}`, canvas.width/2, 480); 
+
+            // Cargar y dibujar el logo en el centro
+            const logo = new Image();
+            logo.onload = function() {
+                // Dibujar el logo con opacidad reducida y tamaño aumentado
+                ctx.globalAlpha = 0.3;
+                const logoSize = 500;
+                const logoX = (canvas.width - logoSize) / 2;
+                const logoY = (canvas.height - logoSize) / 2;
+                ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+                ctx.globalAlpha = 1.0;
+
+                // Leyenda inferior con texto más remarcado
+                ctx.font = "bold italic 18px Arial";
+                ctx.fillStyle = "#666";
+                ctx.textAlign = "left";
+                ctx.fillText("El comprobante no tiene validez legal y para la elaboración y", 60, 600);
+                ctx.fillText("entrega de DC-3, favor de presentar este documento en el área de capacitación.", 60, 620);
+
+                // Crear y descargar la imagen
+                const link = document.createElement('a');
+                link.download = `Comprobante_${userName.toUpperCase()}_Seguridad_Salud_Proteccion_Ambiental.jpg`;
+                link.href = canvas.toDataURL('image/jpeg');
+                link.click();
+                
+                // Borrar el progreso del PDF después de descargar el comprobante
+                deletePDFProgress();
+                
+                // Redirigir automáticamente después de descargar el comprobante
+                setTimeout(function() {
+                    window.location.href = '../../index.html';
+                }, 1000);
+            };
+            
+            // Si hay un error al cargar el logo, continuar sin él
+            logo.onerror = function() {
+                console.log("Error al cargar el logo, generando comprobante sin logo");
+                
+                // Leyenda inferior con texto más remarcado
+                ctx.font = "bold italic 18px Arial";
+                ctx.fillStyle = "#666";
+                ctx.textAlign = "left";
+                ctx.fillText("El comprobante no tiene validez legal y para la elaboración y", 60, 600);
+                ctx.fillText("entrega de DC-3, favor de presentar este documento en el área de capacitación.", 60, 620);
+
+                // Crear y descargar la imagen
+                const link = document.createElement('a');
+                link.download = `Comprobante_${userName.toUpperCase()}_Seguridad_Salud_Proteccion_Ambiental.jpg`;
+                link.href = canvas.toDataURL('image/jpeg');
+                link.click();
+                
+                // Borrar el progreso del PDF después de descargar el comprobante
+                deletePDFProgress();
+                
+                // Redirigir automáticamente después de descargar el comprobante
+                setTimeout(function() {
+                    window.location.href = '../../index.html';
+                }, 1000);
+            };
+            
+            // Cargar el logo
+            logo.src = 'logo.svg';
+        });
+    </script>
+    <script>
+        // ==========================================
+//  CONFIGURACIÓN DE ENVÍO A GOOGLE SHEETS
+// ==========================================
+
+// 1. Pega aquí la URL de tu Web App de Google Apps Script
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyPGOdBsfdrWOhip_--aoNOMFHET86FRdewFhtL78IPHc3adkq91Pv0i8tfuysI7B0PFw/exec'; 
+
+// 2. Define el nombre del módulo ACTUAL. 
+// IMPORTANTE: Debe contener el número del módulo (ej: "05" o "5") para que el script sepa en qué columna ponerlo.
+const NOMBRE_MODULO = "Módulo 01"; 
+
+/**
+ * Función para enviar la calificación a Google Sheets
+ * @param {number} score - Puntaje obtenido (ej: 4)
+ * @param {number} percentage - Porcentaje obtenido (ej: 80)
+ */
+function enviarCalificacionGoogle(score, percentage) {
+    // Recuperar datos del usuario guardados en el Login
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    
+    if (!userData) {
+        console.error("No hay datos de usuario para enviar.");
+        return;
+    }
+
+    // Preparar los datos para enviar
+    const formData = new FormData();
+    formData.append('nombre', userData.firstName + ' ' + userData.lastName);
+    formData.append('mep', userData.mep);
+    formData.append('region', userData.region);
+    formData.append('modulo', NOMBRE_MODULO);
+    formData.append('calificacion', score); 
+    formData.append('porcentaje', percentage.toFixed(0) + '%'); 
+
+    console.log("Enviando datos a Google Sheets...", Object.fromEntries(formData));
+
+    // Enviar usando fetch (POST)
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Éxito al guardar en Google Sheets:', data);
+        if(data.result === "success") {
+            console.log("Fila actualizada: " + data.row);
+        }
+    })
+    .catch(error => {
+        console.error('Error al enviar a Google Sheets:', error);
+    });
+}
+    </script>
+</body>
+</html>

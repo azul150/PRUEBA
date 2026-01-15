@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Llaves Hidráulicas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .question-number {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        /* --- ESTILOS PARA FRACCIONES --- */
+        .frac {
+            display: inline-block;
+            position: relative;
+            vertical-align: middle;
+            letter-spacing: 0.001em;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        .frac > sup {
+            display: block;
+            padding: 0.1em;
+            border-bottom: 1px solid #000;
+            line-height: 1;
+        }
+        .frac > sub {
+            display: block;
+            padding: 0.1em;
+            line-height: 1;
+        }
+        /* ----------------------------- */
+
+        .options label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .options input {
+            margin-right: 10px;
+        }
+        .user-info {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .certificate {
+            display: none;
+            border: 3px solid #3498db;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            background-color: white;
+        }
+        .certificate h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .certificate-info {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .certificate-footer {
+            text-align: left;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 30px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .download-btn {
+            background-color: #27ae60;
+            margin-top: 15px;
+        }
+        .download-btn:hover {
+            background-color: #219653;
+        }
+        
+        /* Estilos para preguntas bloqueadas */
+        .options label.disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        input:disabled {
+            cursor: not-allowed;
+        }
+        .question.locked {
+            background-color: #f9f9f9;
+            border-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EVALUACIÓN DE: MANTENIMIENTO Y OPERACIÓN DE LLAVES DE FUERZA HIDRAULICAS</h1>
+        
+        <div id="userInfo" class="user-info" style="display: none;">
+            <p><strong>Usuario:</strong> <span id="userDisplayName"></span></p>
+            <p><strong>MEP:</strong> <span id="userMEP"></span></p>
+            <p><strong>Región:</strong> <span id="userRegion"></span></p>
+        </div>
+        
+        <div id="evaluationSection">
+            <p><strong>Instrucción:</strong> Lee con atención y señala la respuesta correcta. En las preguntas de selección múltiple, marca todas las que apliquen.</p>
+            
+            <form id="evaluationForm">
+                </form>
+            
+            <div id="result" class="result" style="display: none;"></div>
+            
+            <div id="certificate" class="certificate">
+                <h2>Comprobante de finalización del curso</h2>
+                <h3>Llaves de Fuerza Hidráulicas</h3>
+                
+                <div class="certificate-info">
+                    <p><strong>Nombre del usuario:</strong> <span id="certUserName"></span></p>
+                    <p><strong>MEP:</strong> <span id="certMEP"></span></p>
+                    <p><strong>Fecha de finalización:</strong> <span id="certDate"></span></p>
+                </div>
+                
+                <div class="certificate-footer">
+                    <p>Este comprobante no tiene valor oficial y solo puede ser canjeado en el Área de Capacitación</p>
+                </div>
+                
+                <button class="download-btn" id="downloadBtn">Descargar Comprobante</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función auxiliar para crear HTML de fracciones
+        function frac(num, den) {
+            return `<span class="frac"><sup>${num}</sup><sub>${den}</sub></span>`;
+        }
+
+       
+        const questionsDatabase = [
+            {
+                id: 1,
+                question: "¿Cuál es la presión hidráulica recomendada para maximizar el par de apriete de las llaves hidráulicas?",
+                options: ["1800 psi.", "1900 psi.", "2000 psi.", "2100 psi."],
+                correctAnswer: 'd', 
+                type: 'radio'
+            },
+            {
+                id: 2,
+                question: "¿Cuál es el modelo de la válvula de control de las llaves hidráulicas?",
+                options: ["DVA37", "DVA35", "DVA38"],
+                correctAnswer: 'b',
+                type: 'radio'
+            },
+            {
+                id: 3,
+                question: "¿A qué presión hidráulica tiene que estar calibrado la bomba de la U/P?",
+                options: ["2100 psi.", "1800 psi.", "1900 psi.", "2000 psi."],
+                correctAnswer: 'a',
+                type: 'radio'
+            },
+            {
+                id: 4,
+                question: "VERDADERO O FALSO: Cuándo se utiliza llave hidráulica con contra llave, ¿se instala la celda de tensión?",
+                options: ["Verdadero.", "Falso."],
+                correctAnswer: 'b',
+                type: 'radio'
+            },
+            {
+                id: 5,
+                question: "VERDADERO O FALSO: Cuándo se utiliza llave hidráulica sin contra llave, ¿se instala la celda de tensión?",
+                options: ["Verdadero.", "Falso."],
+                correctAnswer: 'a',
+                type: 'radio'
+            },
+            {
+                id: 6,
+                question: "En el conjunto de válvulas de una llave hidráulica, para qué sirve la palanca A.",
+                options: ["Palanca de control de la contra llave.", "Palanca de control del cilindro de izaje.", "Selector hidráulico de cambio de velocidad", "Palanca de control de la llave.", "Palanca mecánica de cambio de velocidades"],
+                correctAnswer: 'd', // Izaje suele ser el primero
+                type: 'radio'
+            },
+            {
+                id: 7,
+                question: "En el conjunto de válvulas de una llave hidráulica, para qué sirve la palanca B.",
+                options: ["Palanca de control de la contra llave.", "Palanca de control del cilindro de izaje.", "Selector hidráulico de cambio de velocidad", "Palanca de control de la llave.", "Palanca mecánica de cambio de velocidades"],
+                correctAnswer: 'a', // Llave suele ser la principal
+                type: 'radio'
+            },
+            {
+                id: 8,
+                question: "En el conjunto de válvulas de una llave hidráulica, para qué sirve la palanca C.",
+                options: ["Palanca de control de la contra llave.", "Palanca de control del cilindro de izaje.", "Selector hidráulico de cambio de velocidad", "Palanca de control de la llave.", "Palanca mecánica de cambio de velocidades"],
+                correctAnswer: 'b', // Contra llave / Backup
+                type: 'radio'
+            },
+            {
+                id: 9,
+                question: "En el conjunto de válvulas de una llave hidráulica, para qué sirve el selector D.",
+                options: ["Palanca de control de la contra llave.", "Palanca de control del cilindro de izaje.", "Selector hidráulico de cambio de velocidad", "Palanca de control de la llave.", "Palanca mecánica de cambio de velocidades"],
+                correctAnswer: 'c', 
+                type: 'radio'
+            },
+            {
+                id: 10,
+                question: "En el conjunto de válvulas de una llave hidráulica, para qué sirve la palanca E.",
+                options: ["Palanca mecánica de cambio de velocidades", "Palanca de control de la contra llave.", "Palanca de control del cilindro de izaje.", "Selector hidráulico de cambio de velocidad", "Palanca de control de la llave."],
+                correctAnswer: 'a',
+                type: 'radio'
+            },
+            {
+                id: 11,
+                question: `¿Qué diámetros abarca la llave MCCOY XHT 22”?`,
+                options: [`10 ${frac(3,4)}” – 22”`, `10 ${frac(3,4)}” – 21”`, `5 ${frac(3,4)}” – 22”`],
+                correctAnswer: 'a',
+                type: 'radio'
+            },
+            {
+                id: 12,
+                question: `¿Qué diámetros abarca la llave MCCOY 14 KT”?`,
+                options: [`6 ${frac(5,8)}” – 14”`, `7” – 14”`, `5 ${frac(3,4)}” – 22”`],
+                correctAnswer: 'b', 
+                type: 'radio'
+            },
+            {
+                id: 13,
+                question: `¿Qué diámetros abarca la llave MCCOY 5 ${frac(1,2)} KT?`,
+                options: [`4 ${frac(1,2)}” – 22”`, `5 ${frac(1,2)}” – 2 ${frac(3,8)}”`, `5 ${frac(1,2)}” – 7”`],
+                correctAnswer: 'b', 
+                type: 'radio'
+            },
+            {
+                id: 14,
+                question: "¿Qué diámetros abarca la llave FARR 31 HD?",
+                options: [`10 ${frac(3,4)}” – 31”`, `5 ${frac(1,2)}” – 20”`, `5 ${frac(1,2)}” – 22”`],
+                correctAnswer: 'a',
+                type: 'radio'
+            },
+            {
+                id: 15,
+                question: "¿Qué diámetros abarca la llave FARR 20 80K?",
+                options: [`5 ${frac(1,2)}” – 20”`, `9 ${frac(5,8)}” – 20”`, `5 ${frac(1,2)}” – 22”`],
+                correctAnswer: 'b',
+                type: 'radio'
+            },
+            {
+                id: 16,
+                question: `¿Cuál es el brazo de palanca de la llave FARR 13 ${frac(5,8)} KT - LW?`,
+                options: [`13 ${frac(3,8)}” – 3 ${frac(1,2)}”`, `13 ${frac(7,8)}” – 3 ${frac(1,2)}”`, `14” – 3 ${frac(1,2)}”`],
+                correctAnswer: 'a', 
+                type: 'radio'
+            },
+            {
+                id: 17,
+                question: `¿Cuál es el brazo de palanca de la llave ECKEL 8 ${frac(5,8)} UHT-HS?`,
+                options: [`9”- 2 ${frac(3,8)}”`, `8 ${frac(5,8)}”- 1 ${frac(7,8)}”`, `8 ${frac(5,8)}”- 2 ${frac(3,8)}”`],
+                correctAnswer: 'c',
+                type: 'radio'
+            },
+            {
+                id: 18,
+                question: "¿Qué diámetros abarca la llave ECKEL 14 HSHT-UHT-HS?",
+                options: [`7” – 14”`, `6 ${frac(5,8)}” – 14”`, `5 ${frac(3,4)}” – 22”`],
+                correctAnswer: 'a', 
+                type: 'radio'
+            },
+            {
+                id: 19,
+                question: "¿Cuál es el brazo de palanca de la llave CLINCHER 20 XHT?",
+                options: [`9 ${frac(5,8)}” – 20”`, `5 ${frac(1,2)}” – 20”`, `5 ${frac(1,2)}” – 22”`],
+                correctAnswer: 'a',
+                type: 'radio'
+            },
+            {
+                id: 20,
+                question: `¿Cuál es el brazo de palanca de la llave CLINCHER 3 ${frac(1,2)}?`,
+                options: [`4” – 2”`, `3 ${frac(1,2)}” – 2 ${frac(3,8)}”`, `3 ${frac(1,2)}”- 1 ${frac(3,4)}”`],
+                correctAnswer: 'b',
+                type: 'radio'
+            },
+            {
+                id: 21,
+                question: "¿Qué es una mordaza en términos de operaciones con llave de fuerza hidráulica?",
+                options: ["Componente de acero que sujeta tubería o accesorios por medio de dados.", "Un dado de acero de forma rectangular", "Es un objeto que se coloca en la boca de una persona para impedir que hable."],
+                correctAnswer: 'a',
+                type: 'radio'
+            },
+            {
+                id: 22,
+                question: "¿Qué tipo de aceite se utiliza para operar la llave de enrosque?",
+                options: ["Aceites sintéticos y de base acuosa.", "Aceite capullo.", "Aceite hidráulico anti desgaste derivado del petróleo con inhibidoras de la corrosión y aditivos antiespumantes."],
+                correctAnswer: 'c',
+                type: 'radio'
+            },
+            {
+                id: 23,
+                question: "<strong>(SELECCIONE 2 RESPUESTAS)</strong> ¿Qué tipo de aceite <strong>NO</strong> se utiliza para operar la llave de enrosque?",
+                options: ["Aceites sintéticos y de base acuosa.", "Aceite capullo.", "Aceite hidráulico anti desgaste derivado del petróleo."],
+                correctAnswer: ['a', 'b'], 
+                type: 'checkbox'
+            },
+            {
+                id: 24,
+                question: "¿Cuál es la temperatura máxima que no debe superar el fluido (aceite)?",
+                options: ["95°C", "90°C", "80°C"],
+                correctAnswer: 'c', 
+                type: 'radio'
+            },
+            {
+                id: 25,
+                question: "¿Cuál es la viscosidad mínima y máxima recomendada del aceite para la llave hidráulica?",
+                options: ["119 ssu – 695 ssu.", "100 ssu- 695 ssu.", "98 ssu- 695 ssu"],
+                correctAnswer: 'a', 
+                type: 'radio'
+            },
+            {
+                id: 26,
+                question: "¿Qué medida tiene el acople de presión o de entrada?",
+                options: ["2”", "1”", "-20"],
+                correctAnswer: 'b', 
+                type: 'radio'
+            },
+            {
+                id: 27,
+                question: "¿Qué medida tiene el acople de retorno?",
+                options: [`1 ${frac(1,8)}”`, `1 ${frac(1,3)}”`, `1 ${frac(1,4)}”`],
+                correctAnswer: 'c',
+                type: 'radio'
+            },
+            {
+                id: 28,
+                question: "Antes de operar la llave ¿cuál serían las recomendaciones?",
+                options: ["Familiarizarse muy bien con los controles, estar capacitado correctamente, verificar todos los cables a utilizar, conocer los factores de seguridad.", "Tener 10 días como operativo, a ver visto como se opera el equipo.", "Tener 3 meses en taller y realizar mantenimiento."],
+                correctAnswer: 'a',
+                type: 'radio'
+            },
+            {
+                id: 29,
+                question: "Después de instalar y antes de iniciar operaciones con la llave hidráulica, ¿que se tiene que realizar?",
+                options: ["Verificar unidad de potencia, controles, cinta de freno, diámetro de mordaza, paro automático.", "Verificar manguera neumática, verificar la hora del café, verificar la hora de salida.", "Verificar permisos de trabajo, verificar inspección de H2S, verificar AST."],
+                correctAnswer: 'a',
+                type: 'radio'
+            },
+            {
+                id: 30,
+                question: "¿Qué se tiene que inspeccionar antes y durante la operación de la llave hidráulica?",
+                options: ["Nivel de diésel, balatas, mordazas y dados, ajuste de los pernos del plato, grasa en rotor.", "Nivel de aceite hidráulico, cuantas cubetas de grasa hay disponibles, la hora del pan.", "Nivel de diésel, balatas, mordazas y dados, ajuste de los pernos del plato al finalizar el turno."],
+                correctAnswer: 'a',
+                type: 'radio'
+            }
+        ];
+
+        let randomizedQuestions = [];
+
+        // Verificar sesión y cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUserData = localStorage.getItem('userData');
+            
+            if (savedUserData) {
+                const userData = JSON.parse(savedUserData);
+                showUserInfo(userData);
+                generateRandomQuestions();
+            } else {
+                alert('No hay una sesión activa. Serás redirigido al sistema de inicio de sesión.');
+                window.location.href = 'index.html';
+            }
+        });
+        
+        function showUserInfo(userData) {
+            const userDisplayName = `${userData.firstName} ${userData.lastName}`;
+            document.getElementById('userDisplayName').textContent = userDisplayName;
+            document.getElementById('userMEP').textContent = userData.mep;
+            document.getElementById('userRegion').textContent = userData.region;
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('certUserName').textContent = userDisplayName;
+            document.getElementById('certMEP').textContent = userData.mep;
+        }
+
+        // Generar preguntas aleatorias
+        function generateRandomQuestions() {
+            // Copia del array
+            const questionsCopy = [...questionsDatabase];
+            
+            // Mezclar
+            for (let i = questionsCopy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questionsCopy[i], questionsCopy[j]] = [questionsCopy[j], questionsCopy[i]];
+            }
+            
+            // TOMAR TODAS LAS PREGUNTAS (Sin slice)
+            randomizedQuestions = questionsCopy;
+            
+            renderQuestions();
+        }
+
+        // Renderizar preguntas
+        function renderQuestions() {
+            const form = document.getElementById('evaluationForm');
+            form.innerHTML = '';
+            
+            randomizedQuestions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.innerHTML = `${index + 1}. ${question.question}`;
+                
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+                
+                question.options.forEach((option, optionIndex) => {
+                    const letter = String.fromCharCode(97 + optionIndex); // a, b, c...
+                    
+                    const label = document.createElement('label');
+                    const input = document.createElement('input');
+                    
+                    // Determinar tipo de input (radio o checkbox)
+                    input.type = question.type; 
+                    input.name = `q${question.id}`;
+                    input.value = letter;
+                    input.dataset.qid = question.id; // Guardamos ID real para validar
+                    
+                    label.appendChild(input);
+                    // Insertamos HTML para permitir renderizar las fracciones
+                    const textSpan = document.createElement('span');
+                    textSpan.innerHTML = ` ${option}`;
+                    label.appendChild(textSpan);
+                    
+                    optionsDiv.appendChild(label);
+                });
+                
+                questionDiv.appendChild(questionNumber);
+                questionDiv.appendChild(optionsDiv);
+                form.appendChild(questionDiv);
+            });
+            
+            // Botón de calificar
+            const newGradeBtn = document.createElement('button');
+            newGradeBtn.type = 'button';
+            newGradeBtn.id = 'gradeBtn';
+            newGradeBtn.textContent = 'Calificar Evaluación';
+            newGradeBtn.disabled = true; 
+            form.appendChild(newGradeBtn);
+            
+            newGradeBtn.addEventListener('click', gradeEvaluation);
+            
+            // Listeners para habilitar botón
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('change', checkAllQuestionsAnswered);
+            });
+        }
+        
+        function checkAllQuestionsAnswered() {
+            let allAnswered = true;
+            
+            randomizedQuestions.forEach(q => {
+                const name = `q${q.id}`;
+                const checked = document.querySelector(`input[name="${name}"]:checked`);
+                if (!checked) {
+                    allAnswered = false;
+                }
+            });
+
+            document.getElementById('gradeBtn').disabled = !allAnswered;
+        }
+        
+        function lockQuestionsAfterGrading() {
+            const allInputs = document.querySelectorAll('input');
+            allInputs.forEach(input => input.disabled = true);
+            
+            const allLabels = document.querySelectorAll('.options label');
+            allLabels.forEach(label => {
+                label.classList.add('disabled');
+            });
+            
+            const allQuestions = document.querySelectorAll('.question');
+            allQuestions.forEach(question => question.classList.add('locked'));
+            
+            const gradeBtn = document.getElementById('gradeBtn');
+            if (gradeBtn) {
+                gradeBtn.disabled = true;
+                gradeBtn.textContent = 'Evaluación Completada';
+                gradeBtn.style.backgroundColor = '#95a5a6';
+            }
+        }
+        
+        function gradeEvaluation() {
+            let score = 0;
+            const totalQuestions = randomizedQuestions.length;
+            
+            randomizedQuestions.forEach(q => {
+                const name = `q${q.id}`;
+                
+                if (q.type === 'radio') {
+                    // Lógica para preguntas normales
+                    const selected = document.querySelector(`input[name="${name}"]:checked`);
+                    if (selected && selected.value === q.correctAnswer) {
+                        score++;
+                    }
+                } else if (q.type === 'checkbox') {
+                    // Lógica para preguntas múltiples (Array)
+                    const checkedInputs = document.querySelectorAll(`input[name="${name}"]:checked`);
+                    const selectedValues = Array.from(checkedInputs).map(cb => cb.value).sort();
+                    const correctValues = q.correctAnswer.sort(); // Aseguramos orden
+                    
+                    // Comparamos arrays
+                    if (JSON.stringify(selectedValues) === JSON.stringify(correctValues)) {
+                        score++;
+                    }
+                }
+            });
+            
+            const percentage = (score / totalQuestions) * 100;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = `Obtuviste ${score} de ${totalQuestions} respuestas correctas (${percentage.toFixed(2)}%)`;
+            
+            lockQuestionsAfterGrading();
+            enviarDatosAGoogle(score, percentage);
+            
+            if (percentage >= 80) {
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML += '<br>¡Felicidades! Has aprobado la evaluación.';
+                document.getElementById('certDate').textContent = new Date().toLocaleDateString();
+                document.getElementById('certificate').style.display = 'block';
+                // Lógica de guardado si existiera
+            } else {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML += '<br>No has alcanzado el 80% necesario. Inténtalo de nuevo.';
+                document.getElementById('certificate').style.display = 'none';
+                deletePDFProgress();
+                setTimeout(function() {
+                    alert('Tu progreso ha sido reiniciado.');
+                    window.location.href = '../../index.html';
+                }, 4000);
+            }
+        }
+        
+        function deletePDFProgress() {
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    const userId = `${user.firstName}_${user.lastName}_${user.mep}`.replace(/\s+/g, '_').toUpperCase();
+                    localStorage.removeItem(`pdfProgress_${userId}_llaves_hidraulicas`);
+                } catch (e) { console.error(e); }
+            }
+        }
+        
+        // ==========================
+        // DESCARGA DE COMPROBANTE
+        // ==========================
+        document.getElementById('downloadBtn').addEventListener('click', function(){
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if(!userData) { alert('Error: No se encontró usuario.'); return; }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 1000;
+            canvas.height = 700;
+            const ctx = canvas.getContext('2d');
+
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, "#f0f8ff");
+            gradient.addColorStop(1, "#ffffff");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = "#3498db";
+            ctx.lineWidth = 8;
+            ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+
+            ctx.fillStyle = "#2c3e50";
+            ctx.font = "bold 38px Georgia";
+            ctx.textAlign = "center";
+            ctx.fillText("Comprobante de Finalización del Curso:", canvas.width/2, 120);
+            ctx.fillText("Llaves Hidráulicas", canvas.width/2, 170);
+
+            ctx.font = "bold 30px Arial";
+            ctx.fillStyle = "#000";
+            ctx.fillText("Se otorga el presente comprobante a:", canvas.width/2, 240); 
+
+            ctx.font = "bold 36px 'Times New Roman'";
+            ctx.fillStyle = "#3498db";
+            const userName = `${userData.firstName} ${userData.lastName}`;
+            ctx.fillText(userName.toUpperCase(), canvas.width/2, 320); 
+
+            ctx.font = "bold 26px Arial";
+            ctx.fillStyle = "#333";
+            ctx.fillText(`MEP: ${userData.mep}`, canvas.width/2, 400); 
+            ctx.fillText(`Finalizado el: ${new Date().toLocaleDateString()}`, canvas.width/2, 470); 
+
+            const logo = new Image();
+            logo.onload = function() {
+                ctx.globalAlpha = 0.3;
+                const logoSize = 500;
+                const logoX = (canvas.width - logoSize) / 2;
+                const logoY = (canvas.height - logoSize) / 2;
+                ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+                ctx.globalAlpha = 1.0;
+                generateImage(canvas, userName);
+            };
+            logo.onerror = function() { generateImage(canvas, userName); };
+            logo.src = 'logo.svg';
+        });
+
+        function generateImage(canvas, userName) {
+            const ctx = canvas.getContext('2d');
+            ctx.font = "bold italic 18px Arial";
+            ctx.fillStyle = "#666";
+            ctx.textAlign = "left";
+            ctx.fillText("El comprobante no tiene validez legal y para la elaboración y", 60, 600);
+            ctx.fillText("entrega de DC-3, favor de presentar este documento en el área de capacitación.", 60, 620);
+
+            const link = document.createElement('a');
+            link.download = `Comprobante_${userName.toUpperCase()}_Llaves_Hidraulicas.jpg`;
+            link.href = canvas.toDataURL('image/jpeg');
+            link.click();
+            
+            deletePDFProgress();
+            setTimeout(function() { window.location.href = '../../index.html'; }, 1000);
+        }
+
+        function enviarDatosAGoogle(score, percentage) {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (!userData) return;
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyU5L-DGFvQYUCbr9hRcEuYzLlHJDR9BXJTDV9IoQjbod1yjp9L6PUfKHYJqWEAZTGvpQ/exec';
+            const formData = new FormData();
+            formData.append('nombre', `${userData.firstName} ${userData.lastName}`);
+            formData.append('mep', userData.mep);
+            formData.append('region', userData.region); 
+            formData.append('score', score);
+            formData.append('percentage', percentage.toFixed(2));
+            
+            const resultDiv = document.getElementById('result');
+            const loadingMsg = document.createElement('div');
+            loadingMsg.innerHTML = '<small style="color:blue"><i>Sincronizando...</i></small>';
+            resultDiv.appendChild(loadingMsg);
+
+            fetch(scriptURL, { method: 'POST', body: formData })
+            .then(response => {
+                loadingMsg.innerHTML = '<small style="color:green"><b>✓ Guardado.</b></small>';
+            });
+        }
+    </script>
+</body>
+</html>
